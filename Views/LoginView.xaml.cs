@@ -1,8 +1,9 @@
-﻿using HandyControl.Controls;
+﻿using StarEyes_GUI.ViewModels;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
@@ -12,24 +13,23 @@ using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Shapes;
-using System.Threading;
-namespace StarEyes_GUI {
+
+namespace StarEyes_GUI.Views {
     /// <summary>
-    /// LoginWindow.xaml 的交互逻辑
+    /// 
     /// </summary>
-    public partial class LoginWindow : System.Windows.Window {
-        bool ID_format, pwFormat, serverConn;
-        ServerData Server;
-        public LoginWindow() {
+    public partial class LoginView : Window {
+        public LoginViewModel LoginViewModel { get; set; } = new();
+        
+        bool idFormat, pwFormat;
+        public LoginView() {
             InitializeComponent();
+            DataContext = this;
             Account.Focus();
-            Server = new();
-            serverConn = Server.ConnectServer();
-            
         }
 
         private void Window_Loaded(object sender, RoutedEventArgs e) {
-            var mp4Path = AppDomain.CurrentDomain.BaseDirectory + @"Resources\globe-hevc.mp4";
+            var mp4Path = AppDomain.CurrentDomain.BaseDirectory + @"Assets\globe-hevc.mp4";
             LoginBG.Source = new Uri(mp4Path, UriKind.RelativeOrAbsolute);
             LoginBG.Play();
         }
@@ -40,25 +40,25 @@ namespace StarEyes_GUI {
         }
 
         private void Account_TextChanged(object sender, TextChangedEventArgs e) {
-            ID_format = true;
+            idFormat = true;
             if (Account.Text == "") {
                 ID_null.Visibility = Visibility.Visible;
                 ID_error.Visibility = Visibility.Hidden;
-                ID_format = false;
+                idFormat = false;
             }
             else {
                 if (Account.Text.Length != 5) {
-                    ID_format = false;
+                    idFormat = false;
                 }
                 else {
                     for (int i = 0; i < 5; i++) {
                         if (!Char.IsNumber(Account.Text[i])) {
-                            ID_format = false;
+                            idFormat = false;
                             break;
                         }
                     }
                 }
-                if (ID_format) {
+                if (idFormat) {
                     ID_error.Visibility = Visibility.Hidden;
                     ID_null.Visibility = Visibility.Hidden;
                 }
@@ -88,22 +88,13 @@ namespace StarEyes_GUI {
 
         private void Password_KeyDown(object sender, KeyEventArgs e) {
             if (e.Key == Key.Enter || e.Key == Key.Return) {
-                if (!ID_format) Account.Focus();
+                if (!idFormat) Account.Focus();
                 else if (pwFormat) {
-                    //new Thread(() => {
-                    //    this.Dispatcher.Invoke(new Action(() => {
-                    //        Loading.Visibility = Visibility.Visible;
-                    //    }));
-                    //}).Start();
-                    if (!serverConn) serverConn = Server.ConnectServer();
-                    if (serverConn) {
-                        Login();
-                    }
-                    //new Thread(() => {
-                    //    this.Dispatcher.Invoke(new Action(() => {
-                    //        Loading.Visibility = Visibility.Hidden;
-                    //    }));
-                    //}).Start();
+                    Loading.Visibility = Visibility.Visible;
+                    LoginViewModel.LoginModel.PW = Password.Password;
+                    Thread thread = new Thread(new ThreadStart(ThreadTask));
+                    thread.IsBackground = true;
+                    thread.Start();
                 }
                 else {
                     PW_null.Visibility = Visibility.Visible;
@@ -111,10 +102,18 @@ namespace StarEyes_GUI {
             }
         }
 
-        private void Login() {
-            this.Close();
-            //MainWindow mainWindow = new MainWindow();
-            //mainWindow.Show();
+        private void Button_Click(object sender, RoutedEventArgs e) {
+            System.Diagnostics.Trace.WriteLine(LoginViewModel.LoginModel.ID);
+            System.Diagnostics.Trace.WriteLine(LoginViewModel.LoginModel.PW);
         }
+
+        private void ThreadTask() {
+            LoginViewModel.LoginAuthCommand.Execute(null);
+            Thread.Sleep(1000);
+            Application.Current.Dispatcher.Invoke(new Action(() => {
+                Loading.Visibility = Visibility.Hidden;
+            }));
+        }
+
     }
 }
