@@ -1,0 +1,7 @@
+﻿[*.cs]
+
+# CS8600: 将 null 字面量或可能为 null 的值转换为非 null 类型。
+dotnet_diagnostic.CS8600.severity = none
+
+# CS0067: 从不使用事件“DelegateCommand.CanExecuteChanged”
+dotnet_diagnostic.CS0067.severity = none

@@ -7,6 +7,9 @@ using System.Threading.Tasks;
 using StarEyes_GUI.ViewModels;
 
 namespace StarEyes_GUI.Models {
+    /// <summary>
+    /// 登录界面模型
+    /// </summary>
     public class LoginModel {
         public string ID { get; set; }
         public string PW { get; set; }

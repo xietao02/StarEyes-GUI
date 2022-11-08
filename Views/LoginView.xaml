@@ -10,7 +10,7 @@
     Width="750"
     Height="550"
     Background="#FF131C2B"
-    Icon="/Assets/logo48.png"
+    Icon="/Assets/icons/logo32.png"
     Loaded="Window_Loaded"
     ResizeMode="CanMinimize"
     WindowStartupLocation="CenterScreen"
@@ -49,15 +49,13 @@
             PasswordChar="●"
             Style="{DynamicResource PasswordBoxExtend}" />
         <Image
-            x:Name="Logo"
             Width="80"
             Height="80"
-            Margin="545,94,0,0"
-            HorizontalAlignment="Left"
+            Margin="0,94,125,0"
+            HorizontalAlignment="Right"
             VerticalAlignment="Top"
-            Source="/Assets/logo128.png" />
+            Source="/Assets/icons/logo128.png" />
         <TextBlock
-            x:Name="Brand"
             Width="153"
             Margin="0,179,88.5,0"
             HorizontalAlignment="Right"
@@ -65,8 +63,7 @@
             FontSize="36"
             FontWeight="Bold"
             Foreground="#FFE3E9F3"
-            Text="StarEyes"
-            TextWrapping="Wrap" />
+            Text="StarEyes" />
         <TextBlock
             x:Name="ID_null"
             Margin="510,308,0,0"
@@ -103,22 +100,16 @@
             Text="info: 密码或密码错误"
             TextWrapping="Wrap"
             Visibility="Hidden" />
-        <hc:LoadingLine
+        <hc:LoadingCircle
             x:Name="Loading"
-            Width="750"
-            Height="10"
-            Margin="0,0,0,22"
+            Width="56"
+            Height="56"
             HorizontalAlignment="Center"
-            VerticalAlignment="Bottom"
-            DotCount="6"
-            DotDiameter="9"
-            DotSpeed="3"
+            VerticalAlignment="Center"
+            DotCount="5"
+            DotDiameter="8"
+            DotSpeed="4"
             Foreground="#FFBCC9F3"
             Visibility="Hidden" />
-        <Button
-            Margin="607,435,0,0"
-            HorizontalAlignment="Left"
-            VerticalAlignment="Top"
-            Content="Debug" Click="Button_Click" />
     </Grid>
 </Window>

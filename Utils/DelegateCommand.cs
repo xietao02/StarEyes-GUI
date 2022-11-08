@@ -6,7 +6,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Input;
 
-namespace StarEyes_GUI.Commands {
+namespace StarEyes_GUI.Utils {
 
     /// <summary>
     /// 操作指令的基础
@@ -14,14 +14,14 @@ namespace StarEyes_GUI.Commands {
     public class DelegateCommand : ICommand {
         public event EventHandler? CanExecuteChanged;
 
-        public bool CanExecute(object parameter) {
+        public bool CanExecute(object? parameter) {
             if (this.CanExecuteCommand == null) {
                 return true;
             }
             else return CanExecuteCommand(parameter);
         }
 
-        public void Execute(object parameter) {
+        public void Execute(object? parameter) {
             if (this.ExecuteCommand == null) {
                 return;
             }
