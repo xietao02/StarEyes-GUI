@@ -1,13 +1,6 @@
 ﻿using MySql.Data.MySqlClient;
 using StarEyes_GUI.Utils;
 using StarEyes_GUI.Models;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Net.Mail;
-using System.Text;
-using System.Threading.Tasks;
-using System.Windows.Ink;
 
 namespace StarEyes_GUI.ViewModels
 {

@@ -1,20 +1,8 @@
-﻿using StarEyes_GUI.Models;
-using StarEyes_GUI.UserControls;
+﻿using StarEyes_GUI.UserControls;
 using StarEyes_GUI.ViewModels;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading;
-using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Documents;
-using System.Windows.Input;
-using System.Windows.Media;
-using System.Windows.Media.Imaging;
-using System.Windows.Shapes;
+using static StarEyes_GUI.UserControls.SideBar;
 
 namespace StarEyes_GUI.Views {
     /// <summary>
@@ -23,108 +11,67 @@ namespace StarEyes_GUI.Views {
     public partial class DashboardView : Window {
         public DashboardViewModel DashboardViewModel { get; set; } = new();
         PageTransition Pages;
-        int curIndex, lastIndex;
-        LoginView loginView;
+        Header Header;
+        LoginView? loginView;
 
         public DashboardView() {
             InitializeComponent();
             DataContext = this;
-            curIndex = 0;
-            SideBarItem1.bt.Foreground = new SolidColorBrush(Color.FromRgb(0xFF, 0xE4, 0x97));
+            Switch += SwitchPageHandler;
+
+            // 初始化 Header
+            Header = new Header(DashboardViewModel);
+            theGrid.Children.Add(Header);
+            Grid.SetColumnSpan(Header, 2);
+
+            // 初始化 Sidebar
+            SideBar sideBar = new SideBar();
+            theGrid.Children.Add(sideBar);
+            Grid.SetRow(sideBar, 1);
+
+            // 初始化 Pages
             Pages = new PageTransition(DashboardViewModel);
-            this.theGrid.Children.Add(Pages);
+            theGrid.Children.Add(Pages);
             Grid.SetRow(Pages, 1);
             Grid.SetColumn(Pages, 1);
+            Pages.SizeChanged += CalPageItemWidth;
+
         }
         
-        // SwitchEvent 路由事件处理器
-        private void SwitchHandler(object sender, SwitchEventArgs args) {
-            FrameworkElement element = sender as FrameworkElement;
-            SwitchPages(args.ItemIndex);
-            if (element == this.Sidebar) {
-                args.Handled = true;
+        #region PageItem 控件宽度自适应
+        private void CalPageItemWidth(object o, SizeChangedEventArgs args) {
+            double pageWidth = args.NewSize.Width;
+            if (pageWidth > 1230) {
+                DashboardViewModel.PageItemWidth = pageWidth / 2 - 20;
             }
-        }
-
-        private void Notif_Click(object sender, RoutedEventArgs e) {
-            SwitchPages(2);
-        }
-
-        private void User_Click(object sender, RoutedEventArgs e) {
-            SwitchPages(4);
-        }
-
-        private void Exit_Click(object sender, RoutedEventArgs e) {
-            loginView = new();
-            loginView.Show();
-            this.Close();
-        }
-
-        #region 切换页面
-        private void SwitchPages(int newIndex) {
-            if(curIndex != newIndex) {
-                lastIndex = curIndex;
-                curIndex = newIndex;
-                Pages.SwitchPage(curIndex);
-                switch (curIndex) {
-                    case 0:
-                        SideBarItem1.IconSrc = "/Assets/icons/overview-active.png";
-                        SideBarItem1.bt.Foreground = new SolidColorBrush(Color.FromRgb(0xFF, 0xE4, 0x97));
-                        break;
-                    case 1:
-                        SideBarItem2.IconSrc = "/Assets/icons/camera-active.png";
-                        SideBarItem2.bt.Foreground = new SolidColorBrush(Color.FromRgb(0xFF, 0xE4, 0x97));
-                        break;
-                    case 2:
-                        SideBarItem3.IconSrc = "/Assets/icons/event-active.png";
-                        SideBarItem3.bt.Foreground = new SolidColorBrush(Color.FromRgb(0xFF, 0xE4, 0x97));
-                        break;
-                    case 3:
-                        SideBarItem4.IconSrc = "/Assets/icons/cpu-active.png";
-                        SideBarItem4.bt.Foreground = new SolidColorBrush(Color.FromRgb(0xFF, 0xE4, 0x97));
-                        break;
-                    case 4:
-                        SideBarItem5.IconSrc = "/Assets/icons/user-active.png";
-                        SideBarItem5.bt.Foreground = new SolidColorBrush(Color.FromRgb(0xFF, 0xE4, 0x97));
-                        break;
-                    case 5:
-                        SideBarItem6.IconSrc = "/Assets/icons/more-active.png";
-                        SideBarItem6.bt.Foreground = new SolidColorBrush(Color.FromRgb(0xFF, 0xE4, 0x97));
-                        break;
-                    default:
-                        break;
-                }
-                switch (lastIndex) {
-                    case 0:
-                        SideBarItem1.IconSrc = "/Assets/icons/overview.png";
-                        SideBarItem1.bt.Foreground = new SolidColorBrush(Color.FromRgb(0xE3, 0xE9, 0xF3));
-                        break;
-                    case 1:
-                        SideBarItem2.IconSrc = "/Assets/icons/camera.png";
-                        SideBarItem2.bt.Foreground = new SolidColorBrush(Color.FromRgb(0xE3, 0xE9, 0xF3));
-                        break;
-                    case 2:
-                        SideBarItem3.IconSrc = "/Assets/icons/event.png";
-                        SideBarItem3.bt.Foreground = new SolidColorBrush(Color.FromRgb(0xE3, 0xE9, 0xF3));
-                        break;
-                    case 3:
-                        SideBarItem4.IconSrc = "/Assets/icons/cpu.png";
-                        SideBarItem4.bt.Foreground = new SolidColorBrush(Color.FromRgb(0xE3, 0xE9, 0xF3));
-                        break;
-                    case 4:
-                        SideBarItem5.IconSrc = "/Assets/icons/user.png";
-                        SideBarItem5.bt.Foreground = new SolidColorBrush(Color.FromRgb(0xE3, 0xE9, 0xF3));
-                        break;
-                    case 5:
-                        SideBarItem6.IconSrc = "/Assets/icons/more.png";
-                        SideBarItem6.bt.Foreground = new SolidColorBrush(Color.FromRgb(0xE3, 0xE9, 0xF3));
-                        break;
-                    default:
-                        break;
-                }
+            else {
+                DashboardViewModel.PageItemWidth = pageWidth - 20;
             }
         }
         #endregion
-        
+
+        #region 切换页面
+
+        // SwitchEvent 路由事件处理器
+        private void SwitchPageHandler(object sender, SwitchEventArgs args) {
+            FrameworkElement element = sender as FrameworkElement;
+            if(args.ItemIndex == -1) {
+                loginView = new();
+                loginView.Show();
+                this.Close();
+            }
+            else Pages.SwitchPage(args.ItemIndex);
+            if (element == this.theGrid) {
+                args.Handled = true;
+            } 
+        }
+        #endregion
+
+        // 为路由事件添加 CLR 事件包装器, XAML 编辑器将使用此包装器来生成自动提示
+        public event SwitchEventHandler Switch {
+            add { AddHandler(SwitchEvent, value); }
+            remove { RemoveHandler(SwitchEvent, value); }
+        }
+
     }
 }

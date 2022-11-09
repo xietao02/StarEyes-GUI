@@ -1,12 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Security.RightsManagement;
-using System.Text;
-using System.Threading.Tasks;
-using StarEyes_GUI.ViewModels;
-
-namespace StarEyes_GUI.Models {
+﻿namespace StarEyes_GUI.Models {
     /// <summary>
     /// 登录界面模型
     /// </summary>

@@ -1,0 +1,95 @@
+﻿<UserControl
+    x:Class="StarEyes_GUI.UserControls.Header"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:hc="https://handyorg.github.io/handycontrol"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    d:DesignHeight="450"
+    d:DesignWidth="800"
+    mc:Ignorable="d">
+    <Grid>
+        <hc:SimplePanel Background="#112d4e">
+            <Image
+                Width="40"
+                Height="40"
+                Margin="20,0,0,0"
+                HorizontalAlignment="Left"
+                VerticalAlignment="Center"
+                Source="/Assets/icons/logo32.png" />
+            <TextBlock
+                Margin="70,0,0,0"
+                HorizontalAlignment="Left"
+                VerticalAlignment="Center"
+                FontSize="36"
+                FontWeight="Bold"
+                Foreground="#FFE3E9F3"
+                Text="StarEyes" />
+            <TextBlock
+                Margin="230,12,0,0"
+                HorizontalAlignment="Left"
+                VerticalAlignment="Center"
+                FontSize="16"
+                FontWeight="Bold"
+                Foreground="#FFE3E9F3"
+                Text="智慧城市" />
+            <Button
+                x:Name="Notif"
+                Width="40"
+                Height="40"
+                Margin="0,8,144,0"
+                HorizontalAlignment="Right"
+                Background="#112d4e"
+                BorderThickness="0"
+                Click="Notif_Click"
+                ToolTipService.HorizontalOffset="-52"
+                ToolTipService.InitialShowDelay="100"
+                ToolTipService.Placement="Bottom"
+                ToolTipService.VerticalOffset="-10">
+                <Button.ToolTip>
+                    <ToolTip Placement="Right">
+                        <TextBlock FontWeight="Bold" Text="{Binding DashboardViewModel.DashboardModel.notifToolTip}" />
+                    </ToolTip>
+                </Button.ToolTip>
+                <Image
+                    x:Name="bell"
+                    Width="22"
+                    Height="22"
+                    Source="{Binding DashboardViewModel.DashboardModel.bellSrc}"
+                    Visibility="{Binding DashboardViewModel.Twinkling}" />
+            </Button>
+            <Button
+                x:Name="User"
+                Width="40"
+                Height="40"
+                Margin="0,8,100,0"
+                HorizontalAlignment="Right"
+                Background="#112d4e"
+                BorderThickness="0"
+                Click="User_Click"
+                ToolTipService.HorizontalOffset="-36"
+                ToolTipService.InitialShowDelay="100"
+                ToolTipService.Placement="Bottom"
+                ToolTipService.VerticalOffset="-10">
+                <Button.ToolTip>
+                    <ToolTip Placement="Right">
+                        <TextBlock FontWeight="Bold" Text="{Binding DashboardViewModel.DashboardModel.userToolTip}" />
+                    </ToolTip>
+                </Button.ToolTip>
+                <Image
+                    Width="26"
+                    Height="26"
+                    Source="/Assets/icons/user.png" />
+            </Button>
+            <Button
+                x:Name="Exit"
+                Margin="0,8,20,0"
+                HorizontalAlignment="Right"
+                VerticalAlignment="Center"
+                Click="Exit_Click"
+                Content="退出登录"
+                FontWeight="Bold"
+                Style="{StaticResource ButtonDanger}" />
+        </hc:SimplePanel>
+    </Grid>
+</UserControl>

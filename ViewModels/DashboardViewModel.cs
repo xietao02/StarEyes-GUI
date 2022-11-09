@@ -1,14 +1,19 @@
 ﻿using StarEyes_GUI.Models;
 using StarEyes_GUI.Utils;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using System.Threading;
-using System.Threading.Tasks;
 
 namespace StarEyes_GUI.ViewModels {
     public class DashboardViewModel : NotificationObject {
+
+		private double _PageItemWidth;
+		public double PageItemWidth {
+			get { return _PageItemWidth; }
+			set {
+				_PageItemWidth = value;
+				RaisePropertyChanged("PageItemWidth");
+			}
+		}
+
 
 		private string _Twinkling;
 		public string Twinkling {

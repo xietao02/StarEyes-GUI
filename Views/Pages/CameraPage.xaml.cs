@@ -1,18 +1,10 @@
 ﻿using StarEyes_GUI.ViewModels;
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using System.IO;
+using System.Reflection;
 using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Documents;
-using System.Windows.Input;
-using System.Windows.Media;
-using System.Windows.Media.Imaging;
-using System.Windows.Navigation;
-using System.Windows.Shapes;
+using Path = System.IO.Path;
 
 namespace StarEyes_GUI.Views.Pages {
     /// <summary>
@@ -22,8 +14,22 @@ namespace StarEyes_GUI.Views.Pages {
         public CameraPage(DashboardViewModel _DashboardViewModel) {
             this.DashboardViewModel = _DashboardViewModel;
             InitializeComponent();
+            var currentAssembly = Assembly.GetEntryAssembly();
+            var currentDirectory = new FileInfo(currentAssembly.Location).DirectoryName;
+            var vlcLibDirectory = new DirectoryInfo(Path.Combine(currentDirectory, "libvlc", IntPtr.Size == 4 ? "win-x86" : "win-x64"));
+            var options = new string[]
+            {
+                 "--file-logging", "-vvv", "--logfile=VLCLogs.log"
+            };
+
+            this.MyControl.SourceProvider.CreatePlayer(vlcLibDirectory, options);
         }
 
         private DashboardViewModel DashboardViewModel;
+
+        private void Button_Click(object sender, RoutedEventArgs e) {
+            this.MyControl.SourceProvider.MediaPlayer.Play(new Uri("rtsp://admin:Aa123456@192.168.1.115:554/stream1&channel=1"));
+            System.Diagnostics.Trace.WriteLine("done");
+        }
     }
 }
