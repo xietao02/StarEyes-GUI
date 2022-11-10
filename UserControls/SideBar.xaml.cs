@@ -24,7 +24,7 @@ namespace StarEyes_GUI.UserControls {
             name: "Switch",
             routingStrategy: RoutingStrategy.Bubble,
             handlerType: typeof(SwitchEventHandler),
-            ownerType: typeof(SideBarItem));
+            ownerType: typeof(SideBar));
 
         // 为路由事件添加 CLR 事件包装器, XAML 编辑器将使用此包装器来生成自动提示
         public event SwitchEventHandler Switch {

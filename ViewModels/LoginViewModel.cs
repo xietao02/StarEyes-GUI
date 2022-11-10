@@ -11,31 +11,31 @@ namespace StarEyes_GUI.ViewModels
     public class LoginViewModel : NotificationObject {
 
         public StarEyesServer server;
+
+        public string? ID { get; set; }
+        public string PW;
+        public bool Auth;
         
-        private LoginModel _LoginModel = new();
-        public LoginModel LoginModel {
-			get { return _LoginModel; }
-			set {
-				_LoginModel = value;
-				RaisePropertyChanged("LoginModel");
-			}
-		}
-        
+        public LoginViewModel() {
+            server = new();
+            Auth = false;
+        }
+
         /// <summary>
         /// 服务器验证登录权限
         /// </summary>
-		public DelegateCommand LoginAuthCommand => new DelegateCommand(obj => {
+        public DelegateCommand LoginAuthCommand => new DelegateCommand(obj => {
 			if (!server.status) server.ConnectServer();
 			else {
-                string cmd = string.Format("SELECT * FROM sys_users WHERE `id`='{0}' AND `password`='{1}'", LoginModel.ID, LoginModel.PW);
+                string cmd = string.Format("SELECT * FROM sys_users WHERE `id`='{0}' AND `password`='{1}'", ID, PW);
 				try {
 					MySqlDataReader reader = server.SQLExecuteReader(cmd);
                     if(reader != null) {
                         if (reader.Read()) {
-                            LoginModel.Auth = true;
-                            StarEyesModel.ID = LoginModel.ID;
+                            Auth = true;
+                            StarEyesModel.ID = ID;
                         }
-                        else LoginModel.Auth = false;
+                        else Auth = false;
                         reader.Close();
                     }
                 }
@@ -45,10 +45,6 @@ namespace StarEyes_GUI.ViewModels
                 
             }
         });
-        
-        public LoginViewModel() {
-			server = new();
-		}
     }
 }
 

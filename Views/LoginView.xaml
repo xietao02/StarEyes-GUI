@@ -33,7 +33,7 @@
             hc:InfoElement.Placeholder="请输入ID"
             KeyDown="Account_KeyDown"
             Style="{DynamicResource TextBoxExtend}"
-            Text="{Binding LoginViewModel.LoginModel.ID}"
+            Text="{Binding LoginViewModel.ID}"
             TextChanged="Account_TextChanged" />
         <PasswordBox
             x:Name="Password"

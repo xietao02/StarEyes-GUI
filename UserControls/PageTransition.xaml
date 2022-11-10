@@ -9,6 +9,11 @@
     d:DesignWidth="800"
     mc:Ignorable="d">
     <UserControl.Resources>
+        <Style x:Key="PageItemBorderStyle" BasedOn="{StaticResource BorderRegion}" TargetType="Border">
+            <Setter Property="Margin" Value="10, 10, 10, 0"/>
+            <Setter Property="Width" Value="{Binding GetItemWidth.ItemWidth}"/>
+        </Style>
+        
         <Style TargetType="{x:Type ContentPresenter}">
             <Setter Property="LayoutTransform">
                 <Setter.Value>

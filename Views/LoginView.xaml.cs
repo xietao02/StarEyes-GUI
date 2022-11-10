@@ -119,7 +119,7 @@ namespace StarEyes_GUI.Views {
                     if (Loading.Visibility == Visibility.Hidden) {
                         Auth_error.Visibility = Visibility.Hidden;
                         Loading.Visibility = Visibility.Visible;
-                        LoginViewModel.LoginModel.PW = Password.Password;
+                        LoginViewModel.PW = Password.Password;
                         Thread thread = new Thread(new ThreadStart(LoginAuth));
                         thread.IsBackground = true;
                         thread.Start();
@@ -136,7 +136,7 @@ namespace StarEyes_GUI.Views {
         #region 登录验证
         private void LoginAuth() {
             LoginViewModel.LoginAuthCommand.Execute(null);
-            if (!LoginViewModel.LoginModel.Auth) {
+            if (!LoginViewModel.Auth) {
                 Thread.Sleep(5000);
                 Application.Current.Dispatcher.Invoke(new Action(() => {
                     Loading.Visibility = Visibility.Hidden;

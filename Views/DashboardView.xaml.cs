@@ -1,4 +1,5 @@
-﻿using StarEyes_GUI.UserControls;
+﻿using StarEyes_GUI.Models;
+using StarEyes_GUI.UserControls;
 using StarEyes_GUI.ViewModels;
 using System.Windows;
 using System.Windows.Controls;
@@ -14,13 +15,16 @@ namespace StarEyes_GUI.Views {
         Header Header;
         LoginView? loginView;
 
+        /// <summary>
+        /// 初始化 DashboardViewModel
+        /// </summary>
         public DashboardView() {
             InitializeComponent();
             DataContext = this;
             Switch += SwitchPageHandler;
 
             // 初始化 Header
-            Header = new Header(DashboardViewModel);
+            Header = new Header();
             theGrid.Children.Add(Header);
             Grid.SetColumnSpan(Header, 2);
 
@@ -30,27 +34,20 @@ namespace StarEyes_GUI.Views {
             Grid.SetRow(sideBar, 1);
 
             // 初始化 Pages
-            Pages = new PageTransition(DashboardViewModel);
+            Pages = new PageTransition();
             theGrid.Children.Add(Pages);
             Grid.SetRow(Pages, 1);
             Grid.SetColumn(Pages, 1);
-            Pages.SizeChanged += CalPageItemWidth;
 
         }
-        
-        #region PageItem 控件宽度自适应
-        private void CalPageItemWidth(object o, SizeChangedEventArgs args) {
-            double pageWidth = args.NewSize.Width;
-            if (pageWidth > 1230) {
-                DashboardViewModel.PageItemWidth = pageWidth / 2 - 20;
-            }
-            else {
-                DashboardViewModel.PageItemWidth = pageWidth - 20;
-            }
-        }
-        #endregion
 
         #region 切换页面
+
+        // 为路由事件添加 CLR 事件包装器, XAML 编辑器将使用此包装器来生成自动提示
+        public event SwitchEventHandler Switch {
+            add { AddHandler(SwitchEvent, value); }
+            remove { RemoveHandler(SwitchEvent, value); }
+        }
 
         // SwitchEvent 路由事件处理器
         private void SwitchPageHandler(object sender, SwitchEventArgs args) {
@@ -66,12 +63,6 @@ namespace StarEyes_GUI.Views {
             } 
         }
         #endregion
-
-        // 为路由事件添加 CLR 事件包装器, XAML 编辑器将使用此包装器来生成自动提示
-        public event SwitchEventHandler Switch {
-            add { AddHandler(SwitchEvent, value); }
-            remove { RemoveHandler(SwitchEvent, value); }
-        }
 
     }
 }

@@ -1,21 +1,22 @@
-﻿using StarEyes_GUI.ViewModels;
+﻿using StarEyes_GUI.UserControls.UCViewModels;
 using System.Windows;
 using System.Windows.Controls;
 using static StarEyes_GUI.UserControls.SideBar;
 
-namespace StarEyes_GUI.UserControls {
+namespace StarEyes_GUI.UserControls
+{
     /// <summary>
     /// Header.xaml 的交互逻辑
     /// </summary>
     public partial class Header : UserControl {
 
-        private DashboardViewModel dashboardViewModel;
-        
-        public Header(DashboardViewModel _DashboardViewModel) {
-            this.dashboardViewModel = _DashboardViewModel;
-            InitializeComponent();
-        }
+        public HeaderViewModel HeaderViewModel { get; set; } = new();
 
+        public Header() {
+            InitializeComponent();
+            DataContext = this;
+        }
+        
         #region 激发路由事件
         private void Notif_Click(object sender, RoutedEventArgs e) {
             SwitchEventArgs args = new SwitchEventArgs(SwitchEvent, this);
@@ -35,5 +36,6 @@ namespace StarEyes_GUI.UserControls {
             this.RaiseEvent(args);
         }
         #endregion
+        
     }
 }

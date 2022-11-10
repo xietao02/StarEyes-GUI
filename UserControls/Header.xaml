@@ -48,15 +48,15 @@
                 ToolTipService.VerticalOffset="-10">
                 <Button.ToolTip>
                     <ToolTip Placement="Right">
-                        <TextBlock FontWeight="Bold" Text="{Binding DashboardViewModel.DashboardModel.notifToolTip}" />
+                        <TextBlock FontWeight="Bold" Text="{Binding HeaderViewModel.NotifToolTip}" />
                     </ToolTip>
                 </Button.ToolTip>
                 <Image
                     x:Name="bell"
                     Width="22"
                     Height="22"
-                    Source="{Binding DashboardViewModel.DashboardModel.bellSrc}"
-                    Visibility="{Binding DashboardViewModel.Twinkling}" />
+                    Source="{Binding HeaderViewModel.BellSrc}"
+                    Visibility="{Binding HeaderViewModel.Twinkling}" />
             </Button>
             <Button
                 x:Name="User"
@@ -73,7 +73,7 @@
                 ToolTipService.VerticalOffset="-10">
                 <Button.ToolTip>
                     <ToolTip Placement="Right">
-                        <TextBlock FontWeight="Bold" Text="{Binding DashboardViewModel.DashboardModel.userToolTip}" />
+                        <TextBlock FontWeight="Bold" Text="{Binding HeaderViewModel.UserToolTip}" />
                     </ToolTip>
                 </Button.ToolTip>
                 <Image

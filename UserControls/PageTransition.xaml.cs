@@ -1,4 +1,5 @@
 ﻿using StarEyes_GUI.ViewModels;
+using StarEyes_GUI.ViewModels.Pages;
 using StarEyes_GUI.Views.Pages;
 using System;
 using System.Windows;
@@ -11,9 +12,7 @@ namespace StarEyes_GUI.UserControls {
     /// </summary>
     public partial class PageTransition : UserControl {
 
-        private DashboardViewModel dashboardViewModel;
-        public PageTransition(DashboardViewModel _DashboardViewModel) {
-            this.dashboardViewModel = _DashboardViewModel;
+        public PageTransition() {
             InitializeComponent();
             InitPage();
         }
@@ -21,19 +20,23 @@ namespace StarEyes_GUI.UserControls {
         UserControl[] Pages = new UserControl[6];
         private int curIndex, toIndex;
 
+        /// <summary>
+        /// 初始化页面
+        /// </summary>
         private void InitPage() {
-            Pages[0] = new OverviewPage(dashboardViewModel);
-            Pages[1] = new CameraPage(dashboardViewModel);
-            Pages[2] = new EventPage(dashboardViewModel);
-            Pages[3] = new ServerPage(dashboardViewModel);
-            Pages[4] = new UserPage(dashboardViewModel);
-            Pages[5] = new AboutPage(dashboardViewModel);
+            Pages[0] = new OverviewView();
+            Pages[1] = new CameraView();
+            Pages[2] = new EventView();
+            Pages[3] = new ServerView();
+            Pages[4] = new UserView();
+            Pages[5] = new AboutView();
             toIndex = 0;
             UserControl pageTo = Pages[toIndex];
             pageTo.Loaded += PageTo_Loaded;
             contentPresenter.Content = pageTo;
         }
-        
+
+        #region 页面切换动画
         public void SwitchPage(int index) {
             if(curIndex != index) {
                 toIndex = index;
@@ -61,5 +64,6 @@ namespace StarEyes_GUI.UserControls {
             showPage.Begin(contentPresenter);
             curIndex = toIndex;
         }
+        #endregion
     }
 }

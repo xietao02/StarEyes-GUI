@@ -3,7 +3,8 @@
     /// 本地数据存储
     /// </summary>
     public static class StarEyesModel {
-        public static string? ID { get; set; }
+        public static string? ID { get; set; } = "debug";
+        public static int EventNum { get; set; } = 0;
     }
 
 }
