@@ -10,24 +10,17 @@
     mc:Ignorable="d">
     <UserControl.Resources>
         <Style
-            x:Key="NormalItem"
+            x:Key="ItemBorder"
             BasedOn="{StaticResource BorderRegion}"
             TargetType="Border">
             <Setter Property="Margin" Value="10,10,10,0" />
             <Setter Property="Width" Value="{Binding ServerViewModel.ItemWidth}" />
         </Style>
-        <Style
-            x:Key="MainItem"
-            BasedOn="{StaticResource BorderRegion}"
-            TargetType="Border">
-            <Setter Property="Margin" Value="10,10,10,0" />
-            <Setter Property="Width" Value="{Binding ServerViewModel.ItemMaxWidth}" />
-        </Style>
     </UserControl.Resources>
-    
+
     <Grid>
         <hc:ScrollViewer>
-            <WrapPanel x:Name="page"/>
+            <WrapPanel x:Name="page" />
         </hc:ScrollViewer>
     </Grid>
 </UserControl>

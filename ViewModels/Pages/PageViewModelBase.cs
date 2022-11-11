@@ -10,7 +10,7 @@ namespace StarEyes_GUI.ViewModels.Pages {
 
         #region PageItem 控件宽度自适应
         
-        private double _ItemWidth;
+        private static double _ItemWidth;
         public double ItemWidth {
             get { return _ItemWidth; }
             set {
@@ -19,7 +19,7 @@ namespace StarEyes_GUI.ViewModels.Pages {
             }
         }
 
-        private double _ItemMaxWidth;
+        private static double _ItemMaxWidth;
         public double ItemMaxWidth {
             get { return _ItemMaxWidth; }
             set {

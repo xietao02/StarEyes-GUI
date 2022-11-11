@@ -9,34 +9,15 @@
     d:DesignHeight="450"
     d:DesignWidth="800"
     mc:Ignorable="d">
-    <UserControl.Resources>
-        <Style
-                x:Key="NormalItem"
-                BasedOn="{StaticResource BorderRegion}"
-                TargetType="Border">
-            <Setter Property="Margin" Value="10,10,10,0" />
-            <Setter Property="Width" Value="{Binding CameraViewModel.ItemWidth}" />
-        </Style>
-        <Style
-                x:Key="MainItem"
-                BasedOn="{StaticResource BorderRegion}"
-                TargetType="Border">
-            <Setter Property="Margin" Value="10,10,10,0" />
-            <Setter Property="Width" Value="{Binding CameraViewModel.ItemMaxWidth}" />
-        </Style>
-    </UserControl.Resources>
     <Grid>
         <hc:ScrollViewer>
             <WrapPanel x:Name="page">
-                <Border Style="{StaticResource MainItem}">
-                    <WrapPanel HorizontalAlignment="Left" VerticalAlignment="Center">
-                        <Button Height="100">test</Button>
-                    </WrapPanel>
+                <Border
+                    Width="{Binding CameraViewModel.ItemMaxWidth}"
+                    Margin="10,10,10,0"
+                    Style="{StaticResource BorderRegion}">
+                    <Grid />
                 </Border>
-                <Border Style="{StaticResource NormalItem}">
-                    <Button Height="100">test</Button>
-                </Border>
-                <uc:CameraItem />
             </WrapPanel>
         </hc:ScrollViewer>
     </Grid>

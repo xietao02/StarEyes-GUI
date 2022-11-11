@@ -4,22 +4,21 @@
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-    x:Name="Dashboard"
-    Title="StarEyes"
-    Width="1000"
-    Height="700"
-    MinWidth="1000"
-    MinHeight="700"
+    Title="StarEyes - 控制面板"
+    Width="1100"
+    Height="750"
+    MinWidth="1100"
+    MinHeight="750"
     Icon="/Assets/icons/logo32.png"
     WindowStartupLocation="CenterScreen"
     mc:Ignorable="d">
     <Grid x:Name="theGrid">
         <Grid.ColumnDefinitions>
             <ColumnDefinition
-                Width="1*"
-                MinWidth="230"
-                MaxWidth="290" />
-            <ColumnDefinition Width="3.5*" />
+                Width="*"
+                MinWidth="200"
+                MaxWidth="230" />
+            <ColumnDefinition Width="4.5*" />
         </Grid.ColumnDefinitions>
         <Grid.RowDefinitions>
             <RowDefinition Height="60" />
