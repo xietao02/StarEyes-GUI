@@ -12,7 +12,7 @@
     <Grid x:Name="testG">
         <Border
             Width="{Binding ItemWidth}"
-            Margin="10,10,10,0"
+            Margin="10"
             Style="{StaticResource BorderRegion}">
             <StackPanel>
                 <TextBlock
@@ -25,9 +25,11 @@
                 <WrapPanel>
                     <Label
                         x:Name="status"
+                        Background="{Binding CameraItemViewModel.Status_Style}"
                         Content="{Binding CameraItemViewModel.Info_CameraStatus}"
                         FontSize="16"
-                        FontWeight="Bold" />
+                        FontWeight="Bold"
+                        Foreground="White" />
                     <hc:Divider
                         MaxHeight="16"
                         Margin="15,0,0,0"
@@ -41,22 +43,47 @@
                         Content="修改信息"
                         FontSize="15"
                         Style="{StaticResource ButtonPrimary}" />
-                    <Button
-                        x:Name="OpenView"
-                        Height="32"
-                        Margin="15,0,0,0"
-                        Content="浏览摄像头"
-                        FontSize="15"
-                        IsEnabled="{Binding CameraItemViewModel.SwitchOpenViewButton}"
-                        Style="{StaticResource ButtonPrimary}" />
-                    <Button
-                        x:Name="CloseView"
-                        Height="32"
-                        Margin="15,0,0,0"
-                        Content="关闭摄像头"
-                        FontSize="15"
-                        IsEnabled="{Binding CameraItemViewModel.SwitchCloseViewButton}"
-                        Style="{StaticResource ButtonPrimary}" />
+                    <Grid>
+                        <Button
+                            x:Name="OpenView"
+                            Height="32"
+                            Margin="15,0,0,0"
+                            HorizontalAlignment="Left"
+                            VerticalAlignment="Center"
+                            Content="浏览摄像头"
+                            FontSize="15"
+                            Style="{StaticResource ButtonPrimary}"
+                            Visibility="{Binding CameraItemViewModel.SwitchOpenViewButton}" />
+                        <Button
+                            x:Name="CloseView"
+                            Height="32"
+                            Margin="15,0,0,0"
+                            HorizontalAlignment="Left"
+                            VerticalAlignment="Center"
+                            Content="关闭摄像头"
+                            FontSize="15"
+                            Style="{StaticResource ButtonPrimary}"
+                            Visibility="{Binding CameraItemViewModel.SwitchCloseViewButton}" />
+                        <Label
+                            x:Name="Volume"
+                            Height="36"
+                            Margin="125,0,0,0"
+                            HorizontalAlignment="Left"
+                            VerticalAlignment="Center"
+                            Visibility="{Binding CameraItemViewModel.SwitchCloseViewButton}">
+                            <WrapPanel>
+                                <TextBlock
+                                    Margin="0,0,10,0"
+                                    VerticalAlignment="Center"
+                                    FontSize="15"
+                                    Foreground="#333333">
+                                    音量
+                                </TextBlock>
+                                <ToggleButton x:Name="VolumeButton" Style="{StaticResource ToggleButtonSwitch}" />
+                            </WrapPanel>
+                        </Label>
+                    </Grid>
+
                 </WrapPanel>
                 <hc:Divider
                     Margin="0,12,0,12"

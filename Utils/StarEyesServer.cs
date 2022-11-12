@@ -7,17 +7,40 @@ namespace StarEyes_GUI.Utils {
     /// 服务器连接
     /// </summary>
     public class StarEyesServer {
-        private readonly string connectStr = String.Format("server={0};port={1};user={2};password={3};database={4};CharSet=utf8;",
+        private readonly static string connectStr = String.Format("server={0};port={1};user={2};password={3};database={4};CharSet=utf8;",
             SE.server, SE.port, SE.user, SE.password, SE.database);
-        public bool status;
-        public static MySqlConnection? connection;
-        public bool ConnectServer() {
-            MySqlConnection conn = new(connectStr);
+
+        public static bool status = false;
+
+        private static MySqlConnection? _connection;
+        public MySqlConnection? connection {
+            get {
+                System.Diagnostics.Trace.WriteLine("connection.State: " + _connection.State);
+                if (_connection == null || !status) {
+                    if (ConnectServer()) {
+                        return _connection;
+                    }
+                    else {
+                        System.Diagnostics.Trace.WriteLine("数据库连接失败！");
+                        return null;
+                    }
+                }
+                else {
+                    return _connection;
+                }
+            }
+            
+            set {
+                _connection = value;
+            }
+        }
+
+        private bool ConnectServer() {
+            connection = new(connectStr);
             try {
-                conn.Open();
-                System.Diagnostics.Trace.WriteLine("Database connection succeeded!");
+                connection.Open();
+                System.Diagnostics.Trace.WriteLine("数据库连接成功！");
                 status = true;
-                connection = conn;
                 return true;
             }
             catch (MySqlException ex) {
@@ -32,16 +55,11 @@ namespace StarEyes_GUI.Utils {
             else System.Diagnostics.Trace.WriteLine("[" + ex.Number + "]" + ex.Message);
         }
 
-        public StarEyesServer() {
-            ConnectServer();
-        }
-
         public bool SQLExecuteNonQuery(string cmd) {
             if (!status) return false;
             else {
                 MySqlCommand Cmd = new(cmd, connection);
                 try {
-                    System.Diagnostics.Trace.WriteLine(cmd);
                     int i = Cmd.ExecuteNonQuery();
                     System.Diagnostics.Trace.WriteLine("Result: " + i);
                     return true;
@@ -53,20 +71,22 @@ namespace StarEyes_GUI.Utils {
             }
         }
 
-        public MySqlDataReader SQLExecuteReader(string cmd) {
-            if (!status) return null;
-            else {
-                MySqlCommand Cmd = new(cmd, connection);
-                try {
-                    System.Diagnostics.Trace.WriteLine(cmd);
-                    MySqlDataReader reader = Cmd.ExecuteReader();
-                    return reader;
-                }
-                catch (MySqlException ex) {
-                    HandleException(ex);
-                    return null;
-                }
+        public MySqlDataReader? SQLExecuteReader(string cmd) {
+            if (!status) {
+                if (!ConnectServer()) return null;
+
             }
+            MySqlCommand Cmd = new(cmd, connection);
+            try {
+                System.Diagnostics.Trace.WriteLine(cmd);
+                MySqlDataReader reader = Cmd.ExecuteReader();
+                return reader;
+            }
+            catch (MySqlException ex) {
+                HandleException(ex);
+                return null;
+            }
+
         }
 
     }
