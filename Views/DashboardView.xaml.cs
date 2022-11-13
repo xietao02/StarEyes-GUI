@@ -1,9 +1,11 @@
-﻿using StarEyes_GUI.Models;
+﻿using HandyControl.Controls;
+using StarEyes_GUI.Models;
 using StarEyes_GUI.UserControls;
 using StarEyes_GUI.ViewModels;
 using System.Windows;
 using System.Windows.Controls;
 using static StarEyes_GUI.UserControls.SideBar;
+using Window = System.Windows.Window;
 
 namespace StarEyes_GUI.Views {
     /// <summary>
@@ -13,7 +15,8 @@ namespace StarEyes_GUI.Views {
         public DashboardViewModel DashboardViewModel { get; set; } = new();
         PageTransition Pages;
         Header Header;
-        LoginView? loginView;
+        SideBar Sidebar;
+        LoginView loginView;
 
         /// <summary>
         /// 初始化 DashboardViewModel
@@ -29,9 +32,9 @@ namespace StarEyes_GUI.Views {
             Grid.SetColumnSpan(Header, 2);
 
             // 初始化 Sidebar
-            SideBar sideBar = new SideBar();
-            theGrid.Children.Add(sideBar);
-            Grid.SetRow(sideBar, 1);
+            Sidebar = new SideBar();
+            theGrid.Children.Add(Sidebar);
+            Grid.SetRow(Sidebar, 1);
 
             // 初始化 Pages
             Pages = new PageTransition();
@@ -49,13 +52,21 @@ namespace StarEyes_GUI.Views {
             remove { RemoveHandler(SwitchEvent, value); }
         }
 
-        // SwitchEvent 路由事件处理器
+        // SwitchEvent 路由事件处理器 - SwitchPageHandler
         private void SwitchPageHandler(object sender, SwitchEventArgs args) {
             FrameworkElement element = sender as FrameworkElement;
             if(args.ItemIndex == -1) {
                 loginView = new();
                 loginView.Show();
                 this.Close();
+            }
+            else if(args.ItemIndex == -2) {
+                Sidebar.SwitchItem(2);
+                Pages.SwitchPage(2);
+            }
+            else if (args.ItemIndex == -4) {
+                Sidebar.SwitchItem(4);
+                Pages.SwitchPage(4);
             }
             else Pages.SwitchPage(args.ItemIndex);
             if (element == this.theGrid) {

@@ -38,7 +38,7 @@ namespace StarEyes_GUI.UserControls {
         
         
         // 依赖属性 SetBinding 包装
-        public BindingExpressionBase SetBinding(DependencyProperty dp, BindingBase binding) {
+        public new BindingExpressionBase SetBinding(DependencyProperty dp, BindingBase binding) {
             return BindingOperations.SetBinding(this, dp, binding);
         }
         

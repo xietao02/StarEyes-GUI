@@ -8,7 +8,7 @@ namespace StarEyes_GUI.Utils
     /// </summary>
     public class NotificationObject : INotifyPropertyChanged
     {
-        public event PropertyChangedEventHandler? PropertyChanged;
+        public event PropertyChangedEventHandler PropertyChanged;
 
         public void RaisePropertyChanged(string propertyName)
         {

@@ -1,11 +1,12 @@
 ﻿<Window
-    x:Class="StarEyes_GUI.Views.Pages.Dialogs.EditCameraItemView"
+    x:Class="StarEyes_GUI.Views.Pages.Dialogs.AddCametaItemView"
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:hc="https://handyorg.github.io/handycontrol"
+    xmlns:local="clr-namespace:StarEyes_GUI.Views.Pages.Dialogs"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-    Title="{Binding theTitle}"
+    Title="StarEyes - 新增摄像头"
     Width="420"
     Height="450"
     Closed="Window_Closed"
@@ -19,7 +20,6 @@
                 x:Name="CameraNameBox"
                 Width="380"
                 Margin="0,0,0,12"
-                hc:InfoElement.Placeholder="{Binding CameraItemViewModel.CameraName}"
                 hc:InfoElement.Title="摄像头名称"
                 LostFocus="CameraNameBox_LostFocus"
                 ShowClearButton="True" />
@@ -28,7 +28,7 @@
                     x:Name="CameraIPBox"
                     Width="170"
                     Margin="2,0,0,12"
-                    hc:InfoElement.Placeholder="{Binding CameraItemViewModel.CameraIP}"
+                    hc:InfoElement.Placeholder=""
                     hc:InfoElement.Title="局域网 IP"
                     LostFocus="CameraIPBox_LostFocus"
                     ShowClearButton="True" />
@@ -36,7 +36,6 @@
                     x:Name="CameraPortBox"
                     Width="170"
                     Margin="40,0,0,12"
-                    hc:InfoElement.Placeholder="{Binding CameraItemViewModel.CameraPort}"
                     hc:InfoElement.Title="端口号"
                     LostFocus="CameraPortBox_LostFocus"
                     ShowClearButton="True" />
@@ -46,7 +45,6 @@
                     x:Name="RTSPAcountBox"
                     Width="170"
                     Margin="2,0,0,12"
-                    hc:InfoElement.Placeholder="{Binding CameraItemViewModel.RTSPAcount}"
                     hc:InfoElement.Title="RTSP 用户名"
                     LostFocus="RTSPAcountBox_LostFocus"
                     ShowClearButton="True" />
@@ -54,19 +52,10 @@
                     x:Name="RTSPPasswordBox"
                     Width="170"
                     Margin="40,0,0,12"
-                    hc:InfoElement.Placeholder="{Binding CameraItemViewModel.RTSPPassword}"
                     hc:InfoElement.Title="RTSP 密码"
                     LostFocus="RTSPPasswordBox_LostFocus"
                     ShowClearButton="True" />
             </WrapPanel>
-            <hc:TextBox
-                x:Name="CameraEventNumBox"
-                Width="380"
-                Margin="0,0,0,12"
-                hc:InfoElement.Placeholder="{Binding CameraItemViewModel.CameraEventNum}"
-                hc:InfoElement.Title="检测事件总数"
-                LostFocus="CameraEventNumBox_LostFocus"
-                ShowClearButton="True" />
             <WrapPanel>
                 <hc:TextBox
                     x:Name="CameraPosLonBox"

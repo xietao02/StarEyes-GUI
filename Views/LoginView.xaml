@@ -65,40 +65,49 @@
             Text="StarEyes" />
         <TextBlock
             x:Name="ID_null"
-            Margin="510,308,0,0"
+            Margin="497,308,0,0"
             HorizontalAlignment="Left"
             VerticalAlignment="Top"
             Foreground="#FFFF8585"
-            Text="info: ID不能为空"
+            Text="ID不能为空"
             TextWrapping="Wrap"
             Visibility="Hidden" />
         <TextBlock
             x:Name="PW_null"
-            Margin="510,370,0,0"
+            Margin="497,370,0,0"
             HorizontalAlignment="Left"
             VerticalAlignment="Top"
             Foreground="#FFFF8585"
-            Text="info: 密码不能为空"
+            Text="密码不能为空"
             TextWrapping="Wrap"
             Visibility="Hidden" />
         <TextBlock
             x:Name="ID_error"
-            Margin="510,308,0,0"
+            Margin="497,308,0,0"
             HorizontalAlignment="Left"
             VerticalAlignment="Top"
             Foreground="#FFFF8585"
-            Text="info: ID为5位数字"
+            Text="ID为5位数字"
             TextWrapping="Wrap"
             Visibility="Hidden" />
         <TextBlock
             x:Name="Auth_error"
-            Margin="510,370,0,0"
+            Margin="497,370,0,0"
             HorizontalAlignment="Left"
             VerticalAlignment="Top"
             Foreground="#FFFF8585"
-            Text="info: 密码或密码错误"
+            Text="密码或密码错误"
             TextWrapping="Wrap"
             Visibility="Hidden" />
+        <TextBlock
+            x:Name="Network_error"
+            Margin="497,370,0,0"
+            HorizontalAlignment="Left"
+            VerticalAlignment="Top"
+            Foreground="#FFFF8585"
+            Text="登录超时，请检查网络设置"
+            TextWrapping="Wrap"
+            Visibility="Hidden"/>
         <hc:LoadingCircle
             x:Name="Loading"
             Width="56"

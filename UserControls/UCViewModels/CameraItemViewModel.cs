@@ -15,7 +15,7 @@ namespace StarEyes_GUI.UserControls.UCViewModels {
         
         #region 摄像头属性
         
-        public bool isLocal = false;
+        public bool canConnect = false;
         public bool isVLCOpen = false;
         public bool isEditViewShow = false;
         public VlcControl VLC;
@@ -99,12 +99,13 @@ namespace StarEyes_GUI.UserControls.UCViewModels {
         public string CameraIP {
             get { return _CameraIP; }
             set {
-                _CameraIP = value;
                 if (CameraStatus) {
                     Info_CameraIP = "IP：" + value;
+                    _CameraIP = value;
                 }
                 else {
                     Info_CameraIP = "未能与摄像头建立连接";
+                    _CameraIP = "未知";
                 }
                 RaisePropertyChanged("Info_CameraIP");
                 RaisePropertyChanged("CameraIP");
@@ -156,7 +157,12 @@ namespace StarEyes_GUI.UserControls.UCViewModels {
         public string CameraPosLat {
             get { return _CameraPosLat; }
             set {
-                _CameraPosLat = value;
+                if(value == "") {
+                    _CameraPosLat = "未知";
+                }
+                else {
+                    _CameraPosLat = value;
+                }
                 Info_CameraPos = String.Format("经纬度：({0}, {1})", CameraPosLon, CameraPosLat);
                 RaisePropertyChanged("Info_CameraPos");
                 RaisePropertyChanged("CameraPosLat");
@@ -167,7 +173,12 @@ namespace StarEyes_GUI.UserControls.UCViewModels {
         public string CameraPosLon {
             get { return _CameraPosLon; }
             set {
-                _CameraPosLon = value;
+                if (value == "") {
+                    _CameraPosLon = "未知";
+                }
+                else {
+                    _CameraPosLon = value;
+                }
                 Info_CameraPos = String.Format("经纬度：({0}, {1})", CameraPosLon, CameraPosLat);
                 RaisePropertyChanged("Info_CameraPos");
                 RaisePropertyChanged("CameraPosLon");
@@ -222,7 +233,7 @@ namespace StarEyes_GUI.UserControls.UCViewModels {
 
         bool CanExecuteOpenVLC(object obj) {
             SwitchOpenViewButton = "Visible";
-            if (isLocal && CameraStatus) {
+            if (canConnect && CameraStatus) {
                 SwitchOpenViewButton_Enable = "True";
                 return true;
             }
@@ -271,21 +282,11 @@ namespace StarEyes_GUI.UserControls.UCViewModels {
         /// <summary>
         /// 构造函数
         /// </summary>
-        /// <param name="isLocal"></param>
-        /// <param name="ID"></param>
-        /// <param name="Name"></param>
-        /// <param name="Status"></param>
-        /// <param name="PosLon"></param>
-        /// <param name="PosLat"></param>
-        /// <param name="EventNum"></param>
-        /// <param name="IP"></param>
-        /// <param name="Port"></param>
-        /// <param name="RTSPAcount"></param>
-        /// <param name="RTSPPassword"></param>
-        public CameraItemViewModel(bool isLocal, string ID, string Name, bool Status, string PosLon, string PosLat, string EventNum, string IP = "", string Port = "", string RTSPAcount = "", string RTSPPassword = "") {
-            this.isLocal = isLocal;
+        public CameraItemViewModel(string ID, string Name, string Status, string PosLon, string PosLat,
+                                    string IP, string Port, string RTSPAcount, string RTSPPassword, string EventNum) {
             CameraID = ID;
-            CameraStatus = Status;
+            if (Status == "1") CameraStatus = true;
+            else CameraStatus = false;
             CameraName = Name;
             CameraEventNum = EventNum;
             CameraPosLat = PosLat;

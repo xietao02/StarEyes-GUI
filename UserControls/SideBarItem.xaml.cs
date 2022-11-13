@@ -12,7 +12,7 @@ namespace StarEyes_GUI.UserControls {
             DataContext = this;
         }
 
-        public string? ItemName { get; set; }
+        public string ItemName { get; set; }
         public int ItemIndex { get; set; }
 
         /// <summary>

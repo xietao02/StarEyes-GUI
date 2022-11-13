@@ -31,8 +31,8 @@ namespace StarEyes_GUI.UserControls {
             add { AddHandler(SwitchEvent, value); }
             remove { RemoveHandler(SwitchEvent, value); }
         }
-        
-        // SwitchEvent 路由事件处理器
+
+        // SwitchEvent 路由事件处理器 - SwitchItemHandler
         private void SwitchItemHandler(object sender, SwitchEventArgs args) {
             FrameworkElement element = sender as FrameworkElement;
             SwitchItem(args.ItemIndex);

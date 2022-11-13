@@ -9,6 +9,8 @@ using System.Threading.Tasks;
 
 namespace StarEyes_GUI.UserControls.UCViewModels {
     public class HeaderViewModel : NotificationObject {
+
+        #region 依赖属性
         private string _UserToolTip;
         public string UserToolTip {
             get { return _UserToolTip; }
@@ -44,6 +46,8 @@ namespace StarEyes_GUI.UserControls.UCViewModels {
                 RaisePropertyChanged("Twinkling");
             }
         }
+
+        #endregion
 
         public HeaderViewModel() {
             CheckEventNum();

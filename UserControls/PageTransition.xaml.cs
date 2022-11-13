@@ -52,7 +52,7 @@ namespace StarEyes_GUI.UserControls {
             hidePage.Begin(contentPresenter);
         }
 
-        private void HidePage_Completed(object? sender, EventArgs e) {
+        private void HidePage_Completed(object sender, EventArgs e) {
             contentPresenter.Content = null;
             UserControl pageTo = Pages[toIndex];
             pageTo.Loaded += PageTo_Loaded;

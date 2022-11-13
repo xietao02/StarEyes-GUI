@@ -1,33 +1,39 @@
 ﻿using HandyControl.Controls;
 using MySql.Data.MySqlClient;
 using System;
+using System.Threading;
+using System.Xml;
 
 namespace StarEyes_GUI.Utils {
     /// <summary>
     /// 服务器连接
     /// </summary>
     public class StarEyesServer {
+        
         private readonly static string connectStr = String.Format("server={0};port={1};user={2};password={3};database={4};CharSet=utf8;",
             SE.server, SE.port, SE.user, SE.password, SE.database);
 
-        public static bool status = false;
-
-        private static MySqlConnection? _connection;
-        public MySqlConnection? connection {
+        /// <summary>
+        /// 封装好的静态的数据库连接
+        /// </summary>
+        private static MySqlConnection _connection = null;
+        public MySqlConnection connection {
             get {
-                System.Diagnostics.Trace.WriteLine("connection.State: " + _connection.State);
-                if (_connection == null || !status) {
-                    if (ConnectServer()) {
+                if (_connection == null) {
+                    if (InitConnection()) {
                         return _connection;
                     }
                     else {
-                        System.Diagnostics.Trace.WriteLine("数据库连接失败！");
                         return null;
                     }
                 }
-                else {
-                    return _connection;
+                else if (_connection.State == System.Data.ConnectionState.Closed) {
+                    if (ReOpenConnection(3)) {
+                        return _connection;
+                    }
+                    else return null;
                 }
+                else return _connection;
             }
             
             set {
@@ -35,59 +41,89 @@ namespace StarEyes_GUI.Utils {
             }
         }
 
-        private bool ConnectServer() {
-            connection = new(connectStr);
-            try {
-                connection.Open();
-                System.Diagnostics.Trace.WriteLine("数据库连接成功！");
-                status = true;
-                return true;
+        /// <summary>
+        /// 初始化数据库连接
+        /// </summary>
+        /// <returns></returns>
+        private bool InitConnection() {
+            _connection = new(connectStr);
+            return ReOpenConnection(3);
+        }
+        
+        /// <summary>
+        /// 数据库连接重连方法
+        /// </summary>
+        /// <param name="times"></param>
+        /// <returns></returns>
+        private bool ReOpenConnection(int times = 1) {
+            if (times > 0) {
+                times--;
+                if (_connection != null) {
+                    try {
+                        _connection.Open();
+                        Console.WriteLine("数据库连接成功！");
+                        return true;
+                    }
+                    catch (MySqlException ex) {
+                        Console.WriteLine("数据库连接失败！剩余自动重连次数：" + times.ToString());
+                        if (times == 0) HandleException(ex);
+                        Thread.Sleep(1000);
+                        return ReOpenConnection(times);
+                    }
+                }
+                else {
+                    return InitConnection();
+                }
             }
-            catch (MySqlException ex) {
-                HandleException(ex);
-                status = false;
-                return false;
-            }
+            else return false;
         }
 
-        public static void HandleException(MySqlException ex) {
-            if (ex.Number == 1042) MessageBox.Warning("Please check network connection.");
-            else System.Diagnostics.Trace.WriteLine("[" + ex.Number + "]" + ex.Message);
+        /// <summary>
+        /// 数据库操作异常处理
+        /// </summary>
+        /// <param name="ex"></param>
+        public void HandleException(MySqlException ex) {
+            if (ex.Number == 1042) MessageBox.Error("无法连接服务器，请检查网络设置！", "网络错误");
+            else Console.WriteLine("[" + ex.Number + "]" + ex.Message);
         }
 
-        public bool SQLExecuteNonQuery(string cmd) {
-            if (!status) return false;
-            else {
+        /// <summary>
+        /// 执行非查询类的数据库操作
+        /// </summary>
+        /// <param name="cmd"></param>
+        /// <returns></returns>
+        public int ExecuteNonQuerySQL(string cmd) {
+            if (connection != null) {
                 MySqlCommand Cmd = new(cmd, connection);
                 try {
-                    int i = Cmd.ExecuteNonQuery();
-                    System.Diagnostics.Trace.WriteLine("Result: " + i);
-                    return true;
+                    return Cmd.ExecuteNonQuery(); ;
                 }
                 catch (MySqlException ex) {
                     HandleException(ex);
-                    return false;
+                    return -1;
                 }
             }
+            else return -1;
         }
 
-        public MySqlDataReader? SQLExecuteReader(string cmd) {
-            if (!status) {
-                if (!ConnectServer()) return null;
-
+        /// <summary>
+        /// 执行查询类的数据库操作
+        /// </summary>
+        /// <param name="cmd"></param>
+        /// <returns></returns>
+        public MySqlDataReader GetSQLReader(string cmd) {
+            if (connection != null) {
+                MySqlCommand Cmd = new(cmd, connection);
+                try {
+                    return Cmd.ExecuteReader();
+                }
+                catch (MySqlException ex) {
+                    HandleException(ex);
+                    return null;
+                }
             }
-            MySqlCommand Cmd = new(cmd, connection);
-            try {
-                System.Diagnostics.Trace.WriteLine(cmd);
-                MySqlDataReader reader = Cmd.ExecuteReader();
-                return reader;
-            }
-            catch (MySqlException ex) {
-                HandleException(ex);
-                return null;
-            }
-
+            else return null;
         }
-
+        
     }
 }

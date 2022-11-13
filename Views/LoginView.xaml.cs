@@ -118,6 +118,7 @@ namespace StarEyes_GUI.Views {
                 else if (pwFormat) {
                     if (Loading.Visibility == Visibility.Hidden) {
                         Auth_error.Visibility = Visibility.Hidden;
+                        Network_error.Visibility = Visibility.Hidden;
                         Loading.Visibility = Visibility.Visible;
                         LoginViewModel.PW = Password.Password;
                         Thread thread = new Thread(new ThreadStart(LoginAuth));
@@ -137,11 +138,19 @@ namespace StarEyes_GUI.Views {
         private void LoginAuth() {
             LoginViewModel.LoginAuthCommand.Execute(null);
             if (!LoginViewModel.Auth) {
-                Thread.Sleep(5000);
-                Application.Current.Dispatcher.Invoke(new Action(() => {
-                    Loading.Visibility = Visibility.Hidden;
-                    Auth_error.Visibility = Visibility.Visible;
-                }));
+                if (!LoginViewModel.Status) {
+                    Application.Current.Dispatcher.Invoke(new Action(() => {
+                        Loading.Visibility = Visibility.Hidden;
+                        Network_error.Visibility = Visibility.Visible;
+                    }));
+                }
+                else {
+                    Thread.Sleep(5000);
+                    Application.Current.Dispatcher.Invoke(new Action(() => {
+                        Loading.Visibility = Visibility.Hidden;
+                        Auth_error.Visibility = Visibility.Visible;
+                    }));
+                }
             }
             else {
                 Application.Current.Dispatcher.Invoke(new Action(() => {

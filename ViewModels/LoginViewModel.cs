@@ -1,6 +1,7 @@
 ﻿using MySql.Data.MySqlClient;
 using StarEyes_GUI.Utils;
 using StarEyes_GUI.Models;
+using System.Windows.Navigation;
 
 namespace StarEyes_GUI.ViewModels
 {
@@ -10,37 +11,31 @@ namespace StarEyes_GUI.ViewModels
     /// </summary>
     public class LoginViewModel : NotificationObject {
 
-        public StarEyesServer server = new();
+        private StarEyesServer Server = new();
 
-        public string? ID { get; set; }
+        public string ID { get; set; }
         public string PW;
         public bool Auth = false;
-        
+        public bool Status;
+
 
         /// <summary>
         /// 服务器验证登录权限
         /// </summary>
         public DelegateCommand LoginAuthCommand => new DelegateCommand(obj => {
-			if (!StarEyesServer.status) server.ConnectServer();
-			else {
-                string cmd = string.Format("SELECT * FROM sys_users WHERE `id`='{0}' AND `password`='{1}'", ID, PW);
-				try {
-					MySqlDataReader reader = server.SQLExecuteReader(cmd);
-                    if(reader != null) {
-                        if (reader.Read()) {
-                            Auth = true;
-                            StarEyesModel.ID = ID;
-                        }
-                        else Auth = false;
-                        reader.Close();
-                    }
+            string cmd = string.Format("SELECT * FROM sys_users WHERE `id`='{0}' AND `password`='{1}'", ID, PW);
+            MySqlDataReader reader = Server.GetSQLReader(cmd);
+            if (reader != null) {
+                Status = true;
+                if (reader.Read()) {
+                    Auth = true;
+                    StarEyesModel.ID = ID;
                 }
-                catch (MySqlException ex) {
-                    StarEyesServer.HandleException(ex);
-                }
-                
+                else reader.Close();
             }
+            else Status = false;
         });
+
     }
 }
 

@@ -1,9 +1,10 @@
-﻿using HandyControl.Data;
-using Org.BouncyCastle.Utilities.Net;
+﻿using Org.BouncyCastle.Tls;
 using StarEyes_GUI.UserControls;
 using StarEyes_GUI.UserControls.UCViewModels;
 using StarEyes_GUI.Utils;
+using StarEyes_GUI.ViewModels.Pages;
 using System;
+using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using System.Windows;
@@ -13,44 +14,46 @@ using System.Windows.Documents;
 using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
-using System.Windows.Media.Media3D;
 using System.Windows.Shapes;
-using static Org.BouncyCastle.Bcpg.Attr.ImageAttrib;
 
 namespace StarEyes_GUI.Views.Pages.Dialogs {
     /// <summary>
-    /// EditCameraItemView.xaml 的交互逻辑
+    /// AddCametaItemView.xaml 的交互逻辑
     /// </summary>
-    public partial class EditCameraItemView : Window {
-        public CameraItemViewModel CameraItemViewModel { get; set; }
+    public partial class AddCametaItemView : Window{
+        public CameraViewModel CameraViewModel { get; set; }
         private StarEyesServer Server = new();
-        public string theTitle { get; set; }
-        
+        public int ID;
+
         bool nameFormat = true;
         bool ipFormat = true;
         bool portFormat = true;
         bool acountFormat = true;
         bool passwordFormat = true;
-        bool eventNumFormat = true;
         bool posLonFormat = true;
         bool posLatFormat = true;
-        
+
         /// <summary>
-        /// 初始化编辑窗口
+        /// 初始化新增摄像头窗口
         /// </summary>
-        /// <param name="cameraItemViewModel"></param>
-        public EditCameraItemView(CameraItemViewModel cameraItemViewModel) {
+        public AddCametaItemView(CameraViewModel cameraViewModel) {
+            CameraViewModel = cameraViewModel;
             InitializeComponent();
-            CameraItemViewModel = cameraItemViewModel;
-            theTitle = "StarEyes - 编辑摄像头信息 - id:" + cameraItemViewModel.CameraID;
             DataContext = this;
             CameraNameBox.Focus();
         }
 
+        
+
         #region 输入验证逻辑
         private void CameraNameBox_LostFocus(object sender, RoutedEventArgs e) {
-            CameraNameBox.ErrorStr = "名称不能超过 20 个字符";
-            if (CameraNameBox.Text.Length > 20) {
+            if (CameraNameBox.Text.Length == 0) {
+                CameraNameBox.ErrorStr = "名称不能为空";
+                nameFormat = false;
+                CameraNameBox.IsError = true;
+            }
+            else if (CameraNameBox.Text.Length > 20) {
+                CameraNameBox.ErrorStr = "名称不能超过 20 个字符";
                 nameFormat = false;
                 CameraNameBox.IsError = true;
             }
@@ -61,10 +64,15 @@ namespace StarEyes_GUI.Views.Pages.Dialogs {
         }
 
         private void CameraIPBox_LostFocus(object sender, RoutedEventArgs e) {
-            CameraIPBox.ErrorStr = "IP 地址格式错误";
-            if (CameraIPBox.Text.Length != 0) {
+            if (CameraIPBox.Text.Length == 0) {
+                CameraIPBox.ErrorStr = "IP 不能为空";
+                ipFormat = false;
+                CameraIPBox.IsError = true;
+            }
+            else if (CameraIPBox.Text.Length != 0) {
+                CameraIPBox.ErrorStr = "IP 地址格式错误";
                 string regexStrIPV4 = (@"^((2(5[0-5]|[0-4]\d))|[0-1]?\d{1,2})(\.((2(5[0-5]|[0-4]\d))|[0-1]?\d{1,2})){3}$");
-                if (Regex.IsMatch(CameraIPBox.Text, regexStrIPV4)){
+                if (Regex.IsMatch(CameraIPBox.Text, regexStrIPV4)) {
                     ipFormat = true;
                     CameraIPBox.IsError = false;
                 }
@@ -80,8 +88,13 @@ namespace StarEyes_GUI.Views.Pages.Dialogs {
         }
 
         private void CameraPortBox_LostFocus(object sender, RoutedEventArgs e) {
-            CameraPortBox.ErrorStr = "端口号格式错误";
-            if (CameraPortBox.Text.Length != 0) {
+            if (CameraPortBox.Text.Length == 0) {
+                CameraPortBox.ErrorStr = "端口号不能为空";
+                portFormat = false;
+                CameraPortBox.IsError = true;
+            }
+            else if (CameraPortBox.Text.Length != 0) {
+                CameraPortBox.ErrorStr = "端口号格式错误";
                 portFormat = true;
                 int port;
                 if (int.TryParse(CameraPortBox.Text, out port)) {
@@ -106,8 +119,13 @@ namespace StarEyes_GUI.Views.Pages.Dialogs {
         }
 
         private void RTSPAcountBox_LostFocus(object sender, RoutedEventArgs e) {
-            RTSPAcountBox.ErrorStr = "用户名不能超过 20 个字符";
-            if (RTSPAcountBox.Text.Length > 20) {
+            if (RTSPAcountBox.Text.Length == 0) {
+                RTSPAcountBox.ErrorStr = "用户名不能为空";
+                acountFormat = false;
+                RTSPAcountBox.IsError = true;
+            }
+            else if (RTSPAcountBox.Text.Length > 20) {
+                RTSPAcountBox.ErrorStr = "用户名不能超过 20 个字符";
                 acountFormat = false;
                 RTSPAcountBox.IsError = true;
             }
@@ -118,40 +136,19 @@ namespace StarEyes_GUI.Views.Pages.Dialogs {
         }
 
         private void RTSPPasswordBox_LostFocus(object sender, RoutedEventArgs e) {
-            RTSPPasswordBox.ErrorStr = "密码不能超过 20 个字符";
-            if (RTSPPasswordBox.Text.Length > 20) {
+            if (RTSPPasswordBox.Text.Length == 0) {
+                RTSPPasswordBox.ErrorStr = "密码不能为空";
+                passwordFormat = false;
+                RTSPPasswordBox.IsError = true;
+            }
+            else if (RTSPPasswordBox.Text.Length > 20) {
+                RTSPPasswordBox.ErrorStr = "密码不能超过 20 个字符";
                 passwordFormat = false;
                 RTSPPasswordBox.IsError = true;
             }
             else {
                 passwordFormat = true;
                 RTSPPasswordBox.IsError = false;
-            }
-        }
-
-        private void CameraEventNumBox_LostFocus(object sender, RoutedEventArgs e) {
-            CameraEventNumBox.ErrorStr = "事件数格式错误";
-            if (CameraEventNumBox.Text.Length != 0) {
-                eventNumFormat = true;
-                int eventNum;
-                if (int.TryParse(CameraEventNumBox.Text, out eventNum)) {
-                    if (eventNum < 0) {
-                        eventNumFormat = false;
-                        CameraEventNumBox.IsError = true;
-                    }
-                    else {
-                        eventNumFormat = true;
-                        CameraEventNumBox.IsError = false;
-                    }
-                }
-                else {
-                    eventNumFormat = false;
-                    CameraEventNumBox.IsError = true;
-                }
-            }
-            else {
-                eventNumFormat = true;
-                CameraEventNumBox.IsError = false;
             }
         }
 
@@ -208,7 +205,6 @@ namespace StarEyes_GUI.Views.Pages.Dialogs {
         }
         #endregion
 
-
         private void Cancel_Click(object sender, RoutedEventArgs e) {
             this.Close();
         }
@@ -229,9 +225,6 @@ namespace StarEyes_GUI.Views.Pages.Dialogs {
             else if (!passwordFormat) {
                 RTSPPasswordBox.Focus();
             }
-            else if (!eventNumFormat) {
-                CameraEventNumBox.Focus();
-            }
             else if (!posLonFormat) {
                 CameraPosLonBox.Focus();
             }
@@ -245,70 +238,24 @@ namespace StarEyes_GUI.Views.Pages.Dialogs {
         }
 
         private void Window_Closed(object sender, EventArgs e) {
-            CameraItemViewModel.isEditViewShow = false;
+            CameraViewModel.isAddViewShow = false;
         }
 
         private void ChangeInfo() {
-            int isChanged = 0;
-            string changes = "";
-            if (CameraNameBox.Text.Length != 0) {
-                isChanged++;
-                changes += "名称、";
-                CameraItemViewModel.CameraName = CameraNameBox.Text;
-                Server.ExecuteNonQuerySQL("UPDATE cameras SET cam_name = '" + CameraNameBox.Text + "' WHERE cam_id = " + CameraItemViewModel.CameraID);
-            }
-            if (CameraIPBox.Text.Length != 0) {
-                isChanged++;
-                changes += "IP、";
-                CameraItemViewModel.CameraIP = CameraIPBox.Text;
-                Server.ExecuteNonQuerySQL("UPDATE cameras SET ip = '" + CameraIPBox.Text + "' WHERE cam_id = " + CameraItemViewModel.CameraID);
-            }
-            if (CameraPortBox.Text.Length != 0) {
-                isChanged++;
-                changes += "端口、";
-                CameraItemViewModel.CameraPort = CameraPortBox.Text;
-                Server.ExecuteNonQuerySQL("UPDATE cameras SET port = '" + CameraPortBox.Text + "' WHERE cam_id = " + CameraItemViewModel.CameraID);
-            }
-            if (RTSPAcountBox.Text.Length != 0) {
-                isChanged++;
-                changes += "RTSP账号、";
-                CameraItemViewModel.RTSPAcount = RTSPAcountBox.Text;
-                Server.ExecuteNonQuerySQL("UPDATE cameras SET rtsp_acount = '" + RTSPAcountBox.Text + "' WHERE cam_id = " + CameraItemViewModel.CameraID);
-            }
-            if (RTSPPasswordBox.Text.Length != 0) {
-                isChanged++;
-                changes += "RTSP密码、";
-                CameraItemViewModel.RTSPPassword = RTSPPasswordBox.Text;
-                Server.ExecuteNonQuerySQL("UPDATE cameras SET rtsp_password = '" + RTSPPasswordBox.Text + "' WHERE cam_id = " + CameraItemViewModel.CameraID);
-            }
-            if (CameraEventNumBox.Text.Length != 0) {
-                isChanged++;
-                changes += "事件检测数、";
-                CameraItemViewModel.CameraEventNum = CameraEventNumBox.Text;
-                Server.ExecuteNonQuerySQL("UPDATE cameras SET event_num = '" + CameraEventNumBox.Text + "' WHERE cam_id = " + CameraItemViewModel.CameraID);
-            }
-            if (CameraPosLonBox.Text.Length != 0) {
-                isChanged++;
-                changes += "纬度、";
-                CameraItemViewModel.CameraPosLon = CameraPosLonBox.Text;
-                Server.ExecuteNonQuerySQL("UPDATE cameras SET pos_lon = '" + CameraPosLonBox.Text + "' WHERE cam_id = " + CameraItemViewModel.CameraID);
-            }
-            if (CameraPosLatBox.Text.Length != 0) {
-                isChanged++;
-                changes += "经度、";
-                CameraItemViewModel.CameraPosLat = CameraPosLatBox.Text;
-                Server.ExecuteNonQuerySQL("UPDATE cameras SET pos_lat = '" + CameraPosLatBox.Text + "' WHERE cam_id = " + CameraItemViewModel.CameraID);
-            }
-            if (isChanged == 0) { 
-                HandyControl.Controls.MessageBox.Info("未进行任何修改！", "提示");
+            if (CameraPosLonBox.Text.Length == 0) {
+                // 获取经纬度
             }
             else {
-                string num = "共修改" + isChanged.ToString() + "项摄像头信息：";
-                changes = changes.Substring(0, changes.Length - 1);
-                string info = num + changes + "。";
-                HandyControl.Controls.MessageBox.Success(info, "修改成功"); 
+                
             }
+            if (CameraPosLatBox.Text.Length == 0) {
+                
+            }
+            else {
+                
+            }
+            // 生成 ID
+            HandyControl.Controls.MessageBox.Success("新增摄像头成功！摄像头 ID：" +  "提示");
         }
-        
     }
 }

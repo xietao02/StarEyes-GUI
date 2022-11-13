@@ -16,7 +16,38 @@
                     Width="{Binding CameraViewModel.ItemMaxWidth}"
                     Margin="10,10,10,0"
                     Style="{StaticResource BorderRegion}">
-                    <Grid />
+                    <StackPanel>
+                        <Grid Margin="0,0,0,15">
+                            <TextBlock
+                                HorizontalAlignment="Left"
+                                VerticalAlignment="Top"
+                                FontSize="36"
+                                FontWeight="Bold"
+                                Text="{Binding CameraViewModel.Info_TotalCameraNum}" />
+                            <Label
+                                Height="44"
+                                Margin="0,4,0,0"
+                                HorizontalAlignment="Right"
+                                VerticalAlignment="Top"
+                                Background="{Binding CameraViewModel.Style_AllCameraStatus_BG}"
+                                Content="{Binding CameraViewModel.Info_AllCameraStatus}"
+                                FontSize="24"
+                                FontWeight="Bold"
+                                Foreground="{Binding CameraViewModel.Style_AllCameraStatus_FG}" />
+                        </Grid>
+                        <hc:Divider
+                            Margin="0,0,0,12"
+                            LineStroke="Gray"
+                            LineStrokeThickness="2" />
+                        <Button
+                            Height="40"
+                            HorizontalAlignment="Right"
+                            FontSize="17"
+                            FontWeight="Bold"
+                            Style="{StaticResource ButtonPrimary}">
+                            新增摄像头
+                        </Button>
+                    </StackPanel>
                 </Border>
             </WrapPanel>
         </hc:ScrollViewer>

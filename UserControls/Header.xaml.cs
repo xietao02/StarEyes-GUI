@@ -20,13 +20,13 @@ namespace StarEyes_GUI.UserControls
         #region 激发路由事件
         private void Notif_Click(object sender, RoutedEventArgs e) {
             SwitchEventArgs args = new SwitchEventArgs(SwitchEvent, this);
-            args.ItemIndex = 2;
+            args.ItemIndex = -2;
             this.RaiseEvent(args);
         }
 
         private void User_Click(object sender, RoutedEventArgs e) {
             SwitchEventArgs args = new SwitchEventArgs(SwitchEvent, this);
-            args.ItemIndex = 4;
+            args.ItemIndex = -4;
             this.RaiseEvent(args);
         }
 
