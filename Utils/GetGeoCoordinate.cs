@@ -1,4 +1,6 @@
-﻿using System;
+﻿using StarEyes_GUI.Models;
+using StarEyes_GUI.ViewModels.Pages;
+using System;
 using System.Collections.Generic;
 using System.Device.Location;
 using System.Linq;
@@ -8,93 +10,42 @@ using System.Threading.Tasks;
 
 namespace StarEyes_GUI.Utils {
     public class GetGeoCoordinate {
-        //private bool GotCoord = false;
-        //GeoCoordinateWatcher watcher;
-        //int index = 0;
+        public Thread thread;
+        private bool GotCoord = false;
+        private bool Reminded = false;
 
-        public GetGeoCoordinate() {
-            Thread thread = new Thread(new ThreadStart(() => {
-                GeoCoordinateWatcher watcher;
-                bool GotCoord = false;
-                int index = 0;
-                while (!GotCoord) {
-                    index++;
-                    Console.WriteLine("{0}号 watcher 激活", index);
-                    watcher = new();
-                    watcher.PositionChanged += (sender, e) => {
-                        var coordinate = e.Position.Location;
-                        if (!coordinate.IsUnknown) {
-                            Console.WriteLine("Lat: {0}, Long: {1}, {2}号 watcher 获取的",
-                                coordinate.Latitude,
-                                coordinate.Longitude,
-                                index);
-                            watcher.Stop();
-                            GotCoord = true;
+        public GetGeoCoordinate(CameraViewModel cameraViewModel) {
+            thread = new Thread(new ThreadStart(() => {
+                if(cameraViewModel.ComputerPosLon == "0" || cameraViewModel.ComputerPosLat == "0") {
+                    while (!GotCoord) {
+                        GeoCoordinateWatcher watcher = new();
+                        watcher.PositionChanged += (sender, e) => {
+                            var coordinate = e.Position.Location;
+                            if (!coordinate.IsUnknown) {
+                                watcher.Stop();
+                                Console.WriteLine("Lat: {0}, Long: {1}",
+                                    coordinate.Latitude,
+                                    coordinate.Longitude);
+                                cameraViewModel.ComputerPosLat = coordinate.Latitude.ToString();
+                                cameraViewModel.ComputerPosLon = coordinate.Longitude.ToString();
+                                GotCoord = true;
+                            }
+                        };
+                        watcher.Start();
+                        Thread.Sleep(3000);
+                        if (!Reminded && (watcher.Permission == GeoPositionPermission.Unknown || watcher.Permission == GeoPositionPermission.Denied)) {
+                            HandyControl.Controls.MessageBox.Warning("请检查设备定位功能是否开启，或是否授权 StarEyes 使用地理位置信息！", "无法获取位置信息");
+                            Reminded = true;
                         }
-                        else {
-                            Console.WriteLine("coordinate 未包含位置信息");
-                        }
-                    };
-                    watcher.Start();
-                    Console.WriteLine("{0}号 watcher 开始睡眠", index);
-                    Thread.Sleep(3000);
-                    Console.WriteLine("{0}号 watcher 销毁", index);
+                    }
                 }
             }));
             thread.IsBackground = true;
             thread.Start();
-            //thread.Abort();
+        }
 
-            //while (!GotCoord) {
-            //    index++;
-            //    Console.WriteLine("新增线程{0}", index);
-            //    Thread thread = new Thread(new ThreadStart(() => {
-            //        int thread_index = index;
-            //        watcher = new();
-            //        watcher.PositionChanged += (sender, e) => {
-            //            var coordinate = e.Position.Location;
-            //            if (coordinate.IsUnknown != true) {
-            //                Console.WriteLine("Lat: {0}, Long: {1}, 线程{2}: 获得经纬度！",
-            //                    coordinate.Latitude,
-            //                    coordinate.Longitude,
-            //                    thread_index);
-            //                watcher.Stop();
-            //                GotCoord = true;
-            //            }
-            //            else {
-            //                Console.WriteLine("定位失败，无法获取经纬度信息。");
-            //            }
-            //        };
-            //        watcher.Start();
-            //        while (true) {
-            //            Console.WriteLine("线程{0}: 发送心跳", thread_index);
-            //            Thread.Sleep(3000);
-            //        }
-            //    }));
-            //    thread.IsBackground = true;
-            //    thread.Start();
-            //    Thread.Sleep(10000);
-            //    //thread.Abort();
-            //}
-
-            //Thread thread = new Thread(new ThreadStart(() => {
-            //    watcher = new();
-            //    watcher.PositionChanged += (sender, e) => {
-            //        var coordinate = e.Position.Location;
-            //        if (coordinate.IsUnknown != true) {
-            //            Console.WriteLine("Lat: {0}, Long: {1}",
-            //                coordinate.Latitude,
-            //                coordinate.Longitude);
-            //            watcher.Stop();
-            //        }
-            //        else {
-            //            Console.WriteLine("定位失败，无法获取经纬度信息。");
-            //        }
-            //    };
-            //    watcher.Start();
-            //}));
-            //thread.IsBackground = true;
-            //thread.Start();
+        ~GetGeoCoordinate() {
+            thread.Abort();
         }
     }
 }

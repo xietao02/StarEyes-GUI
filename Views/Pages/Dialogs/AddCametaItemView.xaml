@@ -20,6 +20,7 @@
                 x:Name="CameraNameBox"
                 Width="380"
                 Margin="0,0,0,12"
+                hc:InfoElement.Necessary="True"
                 hc:InfoElement.Title="摄像头名称"
                 LostFocus="CameraNameBox_LostFocus"
                 ShowClearButton="True" />
@@ -28,7 +29,7 @@
                     x:Name="CameraIPBox"
                     Width="170"
                     Margin="2,0,0,12"
-                    hc:InfoElement.Placeholder=""
+                    hc:InfoElement.Necessary="True"
                     hc:InfoElement.Title="局域网 IP"
                     LostFocus="CameraIPBox_LostFocus"
                     ShowClearButton="True" />
@@ -36,6 +37,7 @@
                     x:Name="CameraPortBox"
                     Width="170"
                     Margin="40,0,0,12"
+                    hc:InfoElement.Necessary="True"
                     hc:InfoElement.Title="端口号"
                     LostFocus="CameraPortBox_LostFocus"
                     ShowClearButton="True" />
@@ -45,6 +47,7 @@
                     x:Name="RTSPAcountBox"
                     Width="170"
                     Margin="2,0,0,12"
+                    hc:InfoElement.Necessary="True"
                     hc:InfoElement.Title="RTSP 用户名"
                     LostFocus="RTSPAcountBox_LostFocus"
                     ShowClearButton="True" />
@@ -52,28 +55,27 @@
                     x:Name="RTSPPasswordBox"
                     Width="170"
                     Margin="40,0,0,12"
+                    hc:InfoElement.Necessary="True"
                     hc:InfoElement.Title="RTSP 密码"
                     LostFocus="RTSPPasswordBox_LostFocus"
                     ShowClearButton="True" />
             </WrapPanel>
-            <WrapPanel>
-                <hc:TextBox
-                    x:Name="CameraPosLonBox"
-                    Width="170"
-                    Margin="2,0,0,0"
-                    hc:InfoElement.Placeholder="{Binding CameraItemViewModel.CameraPosLon}"
-                    hc:InfoElement.Title="纬度"
-                    LostFocus="CameraPosLonBox_LostFocus"
-                    ShowClearButton="True" />
-                <hc:TextBox
-                    x:Name="CameraPosLatBox"
-                    Width="170"
-                    Margin="40,0,0,0"
-                    hc:InfoElement.Placeholder="{Binding CameraItemViewModel.CameraPosLat}"
-                    hc:InfoElement.Title="经度"
-                    LostFocus="CameraPosLatBox_LostFocus"
-                    ShowClearButton="True" />
-            </WrapPanel>
+            <hc:TextBox
+                x:Name="CameraPosLonBox"
+                Width="380"
+                Margin="0,0,0,12"
+                hc:InfoElement.Placeholder="{Binding CameraViewModel.Info_ComputerPosLon}"
+                hc:InfoElement.Title="纬度"
+                LostFocus="CameraPosLonBox_LostFocus"
+                ShowClearButton="True" />
+            <hc:TextBox
+                x:Name="CameraPosLatBox"
+                Width="380"
+                Margin="0,0,0,12"
+                hc:InfoElement.Placeholder="{Binding CameraViewModel.Info_ComputerPosLat}"
+                hc:InfoElement.Title="经度"
+                LostFocus="CameraPosLatBox_LostFocus"
+                ShowClearButton="True" />
         </StackPanel>
         <Button
             Width="170"

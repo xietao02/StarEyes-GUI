@@ -31,9 +31,12 @@ namespace StarEyes_GUI.ViewModels
                     Auth = true;
                     StarEyesModel.ID = ID;
                 }
-                else reader.Close();
+                reader.Close();
             }
-            else Status = false;
+            else {
+                HandyControl.Controls.MessageBox.Error("请检查本机网络或防火墙设置。", "登录超时");
+                Status = false;
+            }
         });
 
     }

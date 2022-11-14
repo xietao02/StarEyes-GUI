@@ -1,4 +1,6 @@
-﻿using Org.BouncyCastle.Tls;
+﻿using MySql.Data.MySqlClient;
+using Org.BouncyCastle.Tls;
+using StarEyes_GUI.Models;
 using StarEyes_GUI.UserControls;
 using StarEyes_GUI.UserControls.UCViewModels;
 using StarEyes_GUI.Utils;
@@ -6,6 +8,7 @@ using StarEyes_GUI.ViewModels.Pages;
 using System;
 using System.Text;
 using System.Text.RegularExpressions;
+using System.Threading;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
@@ -23,6 +26,7 @@ namespace StarEyes_GUI.Views.Pages.Dialogs {
     public partial class AddCametaItemView : Window{
         public CameraViewModel CameraViewModel { get; set; }
         private StarEyesServer Server = new();
+        GetGeoCoordinate TryGetGeoCoordinate;
         public int ID;
 
         bool nameFormat = true;
@@ -41,14 +45,12 @@ namespace StarEyes_GUI.Views.Pages.Dialogs {
             InitializeComponent();
             DataContext = this;
             CameraNameBox.Focus();
+            TryGetGeoCoordinate = new(cameraViewModel);
         }
-
-        
 
         #region 输入验证逻辑
         private void CameraNameBox_LostFocus(object sender, RoutedEventArgs e) {
             if (CameraNameBox.Text.Length == 0) {
-                CameraNameBox.ErrorStr = "名称不能为空";
                 nameFormat = false;
                 CameraNameBox.IsError = true;
             }
@@ -65,7 +67,6 @@ namespace StarEyes_GUI.Views.Pages.Dialogs {
 
         private void CameraIPBox_LostFocus(object sender, RoutedEventArgs e) {
             if (CameraIPBox.Text.Length == 0) {
-                CameraIPBox.ErrorStr = "IP 不能为空";
                 ipFormat = false;
                 CameraIPBox.IsError = true;
             }
@@ -89,7 +90,6 @@ namespace StarEyes_GUI.Views.Pages.Dialogs {
 
         private void CameraPortBox_LostFocus(object sender, RoutedEventArgs e) {
             if (CameraPortBox.Text.Length == 0) {
-                CameraPortBox.ErrorStr = "端口号不能为空";
                 portFormat = false;
                 CameraPortBox.IsError = true;
             }
@@ -120,7 +120,6 @@ namespace StarEyes_GUI.Views.Pages.Dialogs {
 
         private void RTSPAcountBox_LostFocus(object sender, RoutedEventArgs e) {
             if (RTSPAcountBox.Text.Length == 0) {
-                RTSPAcountBox.ErrorStr = "用户名不能为空";
                 acountFormat = false;
                 RTSPAcountBox.IsError = true;
             }
@@ -137,7 +136,6 @@ namespace StarEyes_GUI.Views.Pages.Dialogs {
 
         private void RTSPPasswordBox_LostFocus(object sender, RoutedEventArgs e) {
             if (RTSPPasswordBox.Text.Length == 0) {
-                RTSPPasswordBox.ErrorStr = "密码不能为空";
                 passwordFormat = false;
                 RTSPPasswordBox.IsError = true;
             }
@@ -232,7 +230,7 @@ namespace StarEyes_GUI.Views.Pages.Dialogs {
                 CameraPosLatBox.Focus();
             }
             else {
-                ChangeInfo();
+                SaveInfo();
                 this.Close();
             }
         }
@@ -241,21 +239,61 @@ namespace StarEyes_GUI.Views.Pages.Dialogs {
             CameraViewModel.isAddViewShow = false;
         }
 
-        private void ChangeInfo() {
+        private void SaveInfo() {
+            string cmd;
+            bool Status = true;
+            string cam_id = "-1", 
+                cam_name = CameraNameBox.Text, 
+                organization = StarEyesModel.Organization, 
+                status = "0",
+                pos_lon, 
+                pos_lat, 
+                ip = CameraIPBox.Text, 
+                port = CameraPortBox.Text,
+                rtsp_acount = RTSPAcountBox.Text, 
+                rtsp_password = RTSPPasswordBox.Text, 
+                event_num = "0";
             if (CameraPosLonBox.Text.Length == 0) {
-                // 获取经纬度
+                pos_lon = CameraViewModel.ComputerPosLon;
             }
             else {
-                
+                pos_lon = CameraPosLonBox.Text;
             }
             if (CameraPosLatBox.Text.Length == 0) {
-                
+                pos_lat = CameraViewModel.ComputerPosLat;
             }
             else {
-                
+                pos_lat = CameraPosLatBox.Text;
             }
-            // 生成 ID
-            HandyControl.Controls.MessageBox.Success("新增摄像头成功！摄像头 ID：" +  "提示");
+            Thread thread = new Thread(new ThreadStart(() => {
+                bool isIDUnique = false;
+                while (!isIDUnique && Status) {
+                    Random rdID = new Random();
+                    cam_id = rdID.Next(10000, 100000).ToString();
+                    cmd = string.Format("SELECT * FROM cameras WHERE `cam_id`='{0}'", cam_id);
+                    MySqlDataReader reader = Server.GetSQLReader(cmd);
+                    if (reader != null) {
+                        if (!reader.Read()) {
+                            isIDUnique = true;
+                        }
+                        reader.Close();
+                    }
+                    else {
+                        Status = false;
+                        HandyControl.Controls.MessageBox.Error("新增摄像头失败！", "网络错误");
+                    }
+                }
+                if (Status) {
+                    cmd = string.Format("INSERT INTO cameras (cam_id, cam_name, organization, status, pos_lon, pos_lat, ip, port, rtsp_acount, rtsp_password, event_num)" +
+                    " VALUES ('{0}', '{1}', '{2}', '{3}', '{4}', '{5}', '{6}', '{7}', '{8}', '{9}', '{10}')",
+                    cam_id, cam_name, organization, status, pos_lon, pos_lat, ip, port, rtsp_acount, rtsp_password, event_num);
+                    if (Server.ExecuteNonQuerySQL(cmd) == -1) Status = false;
+                    if (Status) HandyControl.Controls.MessageBox.Success("新增摄像头成功！摄像头 ID：" + cam_id, "提示");
+                    CameraViewModel.SycCameraView();
+                }
+            }));
+            thread.IsBackground = true;
+            thread.Start();
         }
     }
 }

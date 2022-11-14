@@ -1,5 +1,6 @@
 ﻿using Org.BouncyCastle.Tls;
 using StarEyes_GUI.Utils;
+using StarEyes_GUI.ViewModels.Pages;
 using StarEyes_GUI.Views.Pages.Dialogs;
 using System;
 using System.Collections.Generic;
@@ -12,9 +13,10 @@ using Vlc.DotNet.Wpf;
 
 namespace StarEyes_GUI.UserControls.UCViewModels {
     public class CameraItemViewModel : NotificationObject {
-        
+        public CameraViewModel CameraViewModel;
+
         #region 摄像头属性
-        
+
         public bool canConnect = false;
         public bool isVLCOpen = false;
         public bool isEditViewShow = false;
@@ -148,23 +150,30 @@ namespace StarEyes_GUI.UserControls.UCViewModels {
             }
         }
 
-        
+
         /// <summary>
         /// 摄像头地理位置
         /// </summary>
-        public string Info_CameraPos { get; set; }
+        private string _Info_CameraPos;
+        public string Info_CameraPos {
+            get { return _Info_CameraPos; }
+            set {
+                string Lon, Lat;
+                if (CameraPosLon == "0") Lon = "未知";
+                else Lon = CameraPosLon;
+                if (CameraPosLat == "0") Lat = "未知";
+                else Lat = CameraPosLat;
+                _Info_CameraPos = String.Format("经纬度：({0}, {1})", Lon, Lat);
+                RaisePropertyChanged("Info_CameraPos");
+            }
+        }
+
         private string _CameraPosLat;
         public string CameraPosLat {
             get { return _CameraPosLat; }
             set {
-                if(value == "") {
-                    _CameraPosLat = "未知";
-                }
-                else {
-                    _CameraPosLat = value;
-                }
-                Info_CameraPos = String.Format("经纬度：({0}, {1})", CameraPosLon, CameraPosLat);
-                RaisePropertyChanged("Info_CameraPos");
+                _CameraPosLat = value;
+                Info_CameraPos = "update";
                 RaisePropertyChanged("CameraPosLat");
             }
         }
@@ -173,14 +182,8 @@ namespace StarEyes_GUI.UserControls.UCViewModels {
         public string CameraPosLon {
             get { return _CameraPosLon; }
             set {
-                if (value == "") {
-                    _CameraPosLon = "未知";
-                }
-                else {
-                    _CameraPosLon = value;
-                }
-                Info_CameraPos = String.Format("经纬度：({0}, {1})", CameraPosLon, CameraPosLat);
-                RaisePropertyChanged("Info_CameraPos");
+                _CameraPosLon = value;
+                Info_CameraPos = "update";
                 RaisePropertyChanged("CameraPosLon");
             }
         }

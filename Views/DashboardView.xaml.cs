@@ -13,10 +13,6 @@ namespace StarEyes_GUI.Views {
     /// </summary>
     public partial class DashboardView : Window {
         public DashboardViewModel DashboardViewModel { get; set; } = new();
-        PageTransition Pages;
-        Header Header;
-        SideBar Sidebar;
-        LoginView loginView;
 
         /// <summary>
         /// 初始化 DashboardViewModel
@@ -27,20 +23,20 @@ namespace StarEyes_GUI.Views {
             Switch += SwitchPageHandler;
 
             // 初始化 Header
-            Header = new Header();
-            theGrid.Children.Add(Header);
-            Grid.SetColumnSpan(Header, 2);
+            DashboardViewModel.Header = new Header();
+            theGrid.Children.Add(DashboardViewModel.Header);
+            Grid.SetColumnSpan(DashboardViewModel.Header, 2);
 
             // 初始化 Sidebar
-            Sidebar = new SideBar();
-            theGrid.Children.Add(Sidebar);
-            Grid.SetRow(Sidebar, 1);
+            DashboardViewModel.Sidebar = new SideBar();
+            theGrid.Children.Add(DashboardViewModel.Sidebar);
+            Grid.SetRow(DashboardViewModel.Sidebar, 1);
 
             // 初始化 Pages
-            Pages = new PageTransition();
-            theGrid.Children.Add(Pages);
-            Grid.SetRow(Pages, 1);
-            Grid.SetColumn(Pages, 1);
+            DashboardViewModel.PagesPresenter = new PageTransition();
+            theGrid.Children.Add(DashboardViewModel.PagesPresenter);
+            Grid.SetRow(DashboardViewModel.PagesPresenter, 1);
+            Grid.SetColumn(DashboardViewModel.PagesPresenter, 1);
 
         }
 
@@ -56,19 +52,19 @@ namespace StarEyes_GUI.Views {
         private void SwitchPageHandler(object sender, SwitchEventArgs args) {
             FrameworkElement element = sender as FrameworkElement;
             if(args.ItemIndex == -1) {
-                loginView = new();
-                loginView.Show();
+                DashboardViewModel.loginView = new();
+                DashboardViewModel.loginView.Show();
                 this.Close();
             }
             else if(args.ItemIndex == -2) {
-                Sidebar.SwitchItem(2);
-                Pages.SwitchPage(2);
+                DashboardViewModel.Sidebar.SwitchItem(2);
+                DashboardViewModel.PagesPresenter.SwitchPage(2);
             }
             else if (args.ItemIndex == -4) {
-                Sidebar.SwitchItem(4);
-                Pages.SwitchPage(4);
+                DashboardViewModel.Sidebar.SwitchItem(4);
+                DashboardViewModel.PagesPresenter.SwitchPage(4);
             }
-            else Pages.SwitchPage(args.ItemIndex);
+            else DashboardViewModel.PagesPresenter.SwitchPage(args.ItemIndex);
             if (element == this.theGrid) {
                 args.Handled = true;
             } 

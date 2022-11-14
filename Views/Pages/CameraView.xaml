@@ -36,12 +36,14 @@
                                 Foreground="{Binding CameraViewModel.Style_AllCameraStatus_FG}" />
                         </Grid>
                         <hc:Divider
-                            Margin="0,0,0,12"
+                            Margin="0,30,0,10"
                             LineStroke="Gray"
                             LineStrokeThickness="2" />
                         <Button
+                            x:Name="AddCamera"
                             Height="40"
                             HorizontalAlignment="Right"
+                            Click="AddCamera_Click"
                             FontSize="17"
                             FontWeight="Bold"
                             Style="{StaticResource ButtonPrimary}">

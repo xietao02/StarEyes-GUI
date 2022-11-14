@@ -6,8 +6,8 @@
     xmlns:hc="https://handyorg.github.io/handycontrol"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     Title="{Binding theTitle}"
-    Width="420"
-    Height="450"
+    Width="430"
+    Height="510"
     Closed="Window_Closed"
     Icon="/Assets/icons/logo32.png"
     ResizeMode="NoResize"
@@ -27,7 +27,7 @@
                 <hc:TextBox
                     x:Name="CameraIPBox"
                     Width="170"
-                    Margin="2,0,0,12"
+                    Margin="7,0,0,12"
                     hc:InfoElement.Placeholder="{Binding CameraItemViewModel.CameraIP}"
                     hc:InfoElement.Title="局域网 IP"
                     LostFocus="CameraIPBox_LostFocus"
@@ -45,7 +45,7 @@
                 <hc:TextBox
                     x:Name="RTSPAcountBox"
                     Width="170"
-                    Margin="2,0,0,12"
+                    Margin="7,0,0,12"
                     hc:InfoElement.Placeholder="{Binding CameraItemViewModel.RTSPAcount}"
                     hc:InfoElement.Title="RTSP 用户名"
                     LostFocus="RTSPAcountBox_LostFocus"
@@ -71,7 +71,7 @@
                 <hc:TextBox
                     x:Name="CameraPosLonBox"
                     Width="170"
-                    Margin="2,0,0,0"
+                    Margin="7,0,0,0"
                     hc:InfoElement.Placeholder="{Binding CameraItemViewModel.CameraPosLon}"
                     hc:InfoElement.Title="纬度"
                     LostFocus="CameraPosLonBox_LostFocus"
@@ -85,29 +85,37 @@
                     LostFocus="CameraPosLatBox_LostFocus"
                     ShowClearButton="True" />
             </WrapPanel>
+            <WrapPanel Margin="0,25,0,0">
+                <Button
+                    Width="170"
+                    Height="40"
+                    Margin="7,0,0,0"
+                    Click="Cancel_Click"
+                    FontSize="16"
+                    Style="{StaticResource ButtonPrimary}">
+                    取消
+                </Button>
+                <Button
+                    x:Name="Confirm"
+                    Width="170"
+                    Height="40"
+                    Margin="40,0,0,0"
+                    Click="Confirm_Click"
+                    FontSize="16"
+                    Style="{StaticResource ButtonPrimary}">
+                    确定
+                </Button>
+            </WrapPanel>
+            <Button
+                x:Name="Delete"
+                Width="380"
+                Height="40"
+                Margin="0,15,0,0"
+                Click="Delete_Click"
+                FontSize="16"
+                Style="{StaticResource ButtonDanger}">
+                删除摄像头
+            </Button>
         </StackPanel>
-        <Button
-            Width="170"
-            Height="40"
-            Margin="12,0,0,10"
-            HorizontalAlignment="Left"
-            VerticalAlignment="Bottom"
-            Click="Cancel_Click"
-            FontSize="16"
-            Style="{StaticResource ButtonPrimary}">
-            取消
-        </Button>
-        <Button
-            x:Name="Confirm"
-            Width="170"
-            Height="40"
-            Margin="0,0,12,10"
-            HorizontalAlignment="Right"
-            VerticalAlignment="Bottom"
-            Click="Confirm_Click"
-            FontSize="16"
-            Style="{StaticResource ButtonPrimary}">
-            确定
-        </Button>
     </Grid>
 </Window>

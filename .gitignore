@@ -27,6 +27,11 @@ bld/
 
 .vs/
 SE.Properties.cs
+Properties/
+.editorconfig
+packages.config
+App.config
+
 
 # .NET Core
 project.lock.json

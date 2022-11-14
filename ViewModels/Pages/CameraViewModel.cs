@@ -14,7 +14,7 @@ using System.Windows.Data;
 
 namespace StarEyes_GUI.ViewModels.Pages {
     public class CameraViewModel : PageViewModelBase{
-
+        public WrapPanel Page;
         public List<CameraItem> CameraList = new();
         private StarEyesServer Server = new();
         public Binding binding;
@@ -59,32 +59,67 @@ namespace StarEyes_GUI.ViewModels.Pages {
                 RaisePropertyChanged("Info_AllCameraStatus");
             }
         }
+        public string Info_ComputerPosLat { get; set; } = "无法获取位置信息";
+        private string _ComputerPosLat = "0";
+        public string ComputerPosLat {
+            get { return _ComputerPosLat; }
+            set {
+                _ComputerPosLat = value;
+                Info_ComputerPosLat = "默认使用当前位置经度：" + value;
+                RaisePropertyChanged("Info_ComputerPosLat");
+            }
+        }
+
+        public string Info_ComputerPosLon { get; set; } = "无法获取位置信息";
+        private string _ComputerPosLon = "0";
+        public string ComputerPosLon {
+            get { return _ComputerPosLon; }
+            set {
+                _ComputerPosLon = value;
+                Info_ComputerPosLon = "默认使用当前位置纬度：" + value ;
+                RaisePropertyChanged("Info_ComputerPosLon");
+            }
+        }
         #endregion
 
         /// <summary>
-        /// 初始化摄像头列表
+        /// 同步服务器摄像头列表
         /// </summary>
-        public void InitCameraList() {
-            TotalCameraNum = 0;
-            BadConnCameraNum = 0;
-            string cmd = string.Format("SELECT * FROM cameras WHERE `organization`='{0}'", StarEyesModel.Organization);
-            MySqlDataReader reader = Server.GetSQLReader(cmd);
-            if (reader != null) {
-                while (reader.Read()) {
-                    CameraItemViewModel CameraItemViewModel = new(reader[0].ToString(), reader[1].ToString(), reader[3].ToString(), reader[4].ToString(),
-                                        reader[5].ToString(), reader[6].ToString(), reader[7].ToString(), reader[8].ToString(), reader[9].ToString(), reader[10].ToString());
-                    CameraItem cameraItem = new(CameraItemViewModel, binding);
-                    CameraList.Add(cameraItem);
-                    if (CameraItemViewModel.CameraStatus) {
-                        TotalCameraNum++;
+        public bool SycCameraView() {
+            bool Result = false;
+            Application.Current.Dispatcher.Invoke(new Action(() => {
+                TotalCameraNum = 0;
+                BadConnCameraNum = 0;
+                string cmd = string.Format("SELECT * FROM cameras WHERE `organization`='{0}'", StarEyesModel.Organization);
+                MySqlDataReader reader = Server.GetSQLReader(cmd);
+                if (reader != null) {
+                    CameraList.Clear();
+                    while (reader.Read()) {
+                        CameraItemViewModel CameraItemViewModel = new(reader[0].ToString(), reader[1].ToString(), reader[3].ToString(), reader[4].ToString(),
+                                            reader[5].ToString(), reader[6].ToString(), reader[7].ToString(), reader[8].ToString(), reader[9].ToString(), reader[10].ToString());
+                        CameraItemViewModel.CameraViewModel = this;
+                        CameraItem cameraItem = new(CameraItemViewModel, binding);
+                        CameraList.Add(cameraItem);
+                        if (CameraItemViewModel.CameraStatus) {
+                            TotalCameraNum++;
+                        }
+                        else {
+                            BadConnCameraNum++;
+                        }
                     }
-                    else {
-                        BadConnCameraNum++;
-                    }
+                    reader.Close();
+                    TotalCameraNum = CameraList.Count;
+                    Console.WriteLine("Page旧摄像头数:" + (Page.Children.Count - 1));
+                    Page.Children.RemoveRange(1, Page.Children.Count - 1);
+                    Console.WriteLine("清除成功");
+                    CameraList.ForEach(theCameraItem => {
+                        Page.Children.Add(theCameraItem);
+                    });
+                    Result = true;
                 }
-                reader.Close();
-            }
-            TotalCameraNum = CameraList.Count;
+                else Result = false;
+            }));
+            return Result;
         }
         
     }

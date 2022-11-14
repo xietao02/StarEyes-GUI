@@ -3,8 +3,10 @@ using Org.BouncyCastle.Utilities.Net;
 using StarEyes_GUI.UserControls;
 using StarEyes_GUI.UserControls.UCViewModels;
 using StarEyes_GUI.Utils;
+using StarEyes_GUI.ViewModels.Pages;
 using System;
 using System.Text.RegularExpressions;
+using System.Threading;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
@@ -25,6 +27,7 @@ namespace StarEyes_GUI.Views.Pages.Dialogs {
         public CameraItemViewModel CameraItemViewModel { get; set; }
         private StarEyesServer Server = new();
         public string theTitle { get; set; }
+        private string id;
         
         bool nameFormat = true;
         bool ipFormat = true;
@@ -42,7 +45,8 @@ namespace StarEyes_GUI.Views.Pages.Dialogs {
         public EditCameraItemView(CameraItemViewModel cameraItemViewModel) {
             InitializeComponent();
             CameraItemViewModel = cameraItemViewModel;
-            theTitle = "StarEyes - 编辑摄像头信息 - id:" + cameraItemViewModel.CameraID;
+            id = cameraItemViewModel.CameraID;
+            theTitle = "StarEyes - 编辑摄像头信息 - id:" + id;
             DataContext = this;
             CameraNameBox.Focus();
         }
@@ -249,66 +253,88 @@ namespace StarEyes_GUI.Views.Pages.Dialogs {
         }
 
         private void ChangeInfo() {
-            int isChanged = 0;
+            int NumOfChanged = 0;
             string changes = "";
+            string[] cmds = new string[8];
             if (CameraNameBox.Text.Length != 0) {
-                isChanged++;
                 changes += "名称、";
                 CameraItemViewModel.CameraName = CameraNameBox.Text;
-                Server.ExecuteNonQuerySQL("UPDATE cameras SET cam_name = '" + CameraNameBox.Text + "' WHERE cam_id = " + CameraItemViewModel.CameraID);
+                cmds[NumOfChanged++] = "UPDATE cameras SET cam_name = '" + CameraNameBox.Text + "' WHERE cam_id = " + CameraItemViewModel.CameraID;
             }
             if (CameraIPBox.Text.Length != 0) {
-                isChanged++;
                 changes += "IP、";
                 CameraItemViewModel.CameraIP = CameraIPBox.Text;
-                Server.ExecuteNonQuerySQL("UPDATE cameras SET ip = '" + CameraIPBox.Text + "' WHERE cam_id = " + CameraItemViewModel.CameraID);
+                cmds[NumOfChanged++] = "UPDATE cameras SET ip = '" + CameraIPBox.Text + "' WHERE cam_id = " + CameraItemViewModel.CameraID;
             }
             if (CameraPortBox.Text.Length != 0) {
-                isChanged++;
                 changes += "端口、";
                 CameraItemViewModel.CameraPort = CameraPortBox.Text;
-                Server.ExecuteNonQuerySQL("UPDATE cameras SET port = '" + CameraPortBox.Text + "' WHERE cam_id = " + CameraItemViewModel.CameraID);
+                cmds[NumOfChanged++] = "UPDATE cameras SET port = '" + CameraPortBox.Text + "' WHERE cam_id = " + CameraItemViewModel.CameraID;
             }
             if (RTSPAcountBox.Text.Length != 0) {
-                isChanged++;
                 changes += "RTSP账号、";
                 CameraItemViewModel.RTSPAcount = RTSPAcountBox.Text;
-                Server.ExecuteNonQuerySQL("UPDATE cameras SET rtsp_acount = '" + RTSPAcountBox.Text + "' WHERE cam_id = " + CameraItemViewModel.CameraID);
+                cmds[NumOfChanged++] = "UPDATE cameras SET rtsp_acount = '" + RTSPAcountBox.Text + "' WHERE cam_id = " + CameraItemViewModel.CameraID;
             }
             if (RTSPPasswordBox.Text.Length != 0) {
-                isChanged++;
                 changes += "RTSP密码、";
                 CameraItemViewModel.RTSPPassword = RTSPPasswordBox.Text;
-                Server.ExecuteNonQuerySQL("UPDATE cameras SET rtsp_password = '" + RTSPPasswordBox.Text + "' WHERE cam_id = " + CameraItemViewModel.CameraID);
+                cmds[NumOfChanged++] = "UPDATE cameras SET rtsp_password = '" + RTSPPasswordBox.Text + "' WHERE cam_id = " + CameraItemViewModel.CameraID;
             }
             if (CameraEventNumBox.Text.Length != 0) {
-                isChanged++;
                 changes += "事件检测数、";
                 CameraItemViewModel.CameraEventNum = CameraEventNumBox.Text;
-                Server.ExecuteNonQuerySQL("UPDATE cameras SET event_num = '" + CameraEventNumBox.Text + "' WHERE cam_id = " + CameraItemViewModel.CameraID);
+                cmds[NumOfChanged++] = "UPDATE cameras SET event_num = '" + CameraEventNumBox.Text + "' WHERE cam_id = " + CameraItemViewModel.CameraID;
             }
             if (CameraPosLonBox.Text.Length != 0) {
-                isChanged++;
                 changes += "纬度、";
                 CameraItemViewModel.CameraPosLon = CameraPosLonBox.Text;
-                Server.ExecuteNonQuerySQL("UPDATE cameras SET pos_lon = '" + CameraPosLonBox.Text + "' WHERE cam_id = " + CameraItemViewModel.CameraID);
+                cmds[NumOfChanged++] = "UPDATE cameras SET pos_lon = '" + CameraPosLonBox.Text + "' WHERE cam_id = " + CameraItemViewModel.CameraID;
             }
             if (CameraPosLatBox.Text.Length != 0) {
-                isChanged++;
                 changes += "经度、";
                 CameraItemViewModel.CameraPosLat = CameraPosLatBox.Text;
-                Server.ExecuteNonQuerySQL("UPDATE cameras SET pos_lat = '" + CameraPosLatBox.Text + "' WHERE cam_id = " + CameraItemViewModel.CameraID);
+                cmds[NumOfChanged++] = "UPDATE cameras SET pos_lat = '" + CameraPosLatBox.Text + "' WHERE cam_id = " + CameraItemViewModel.CameraID;
             }
-            if (isChanged == 0) { 
+            if (NumOfChanged == 0) {
                 HandyControl.Controls.MessageBox.Info("未进行任何修改！", "提示");
             }
             else {
-                string num = "共修改" + isChanged.ToString() + "项摄像头信息：";
-                changes = changes.Substring(0, changes.Length - 1);
-                string info = num + changes + "。";
-                HandyControl.Controls.MessageBox.Success(info, "修改成功"); 
+                Thread thread = new Thread(new ThreadStart(() =>{
+                    if (Server.ExecuteNonQuerySQL(cmds) == -1) {
+                        HandyControl.Controls.MessageBox.Error("修改信息失败", "网络错误");
+                    }
+                    else {
+                        string num = "共修改" + NumOfChanged.ToString() + "项摄像头信息：";
+                        changes = changes.Substring(0, changes.Length - 1);
+                        string info = num + changes + "。";
+                        HandyControl.Controls.MessageBox.Success(info, "修改成功");
+                    }
+                }));
+                thread.IsBackground = true;
+                thread.Start();
             }
         }
-        
+
+        private void Delete_Click(object sender, RoutedEventArgs e) {
+            string ask = string.Format("删除摄像头[{0}](ID:{1})？", CameraItemViewModel.CameraName, id);
+            if(HandyControl.Controls.MessageBox.Show(ask, "操作确认", MessageBoxButton.YesNo, MessageBoxImage.Question) == MessageBoxResult.Yes) {
+                string cmd = string.Format("DELETE FROM cameras WHERE(cam_id = '{0}' )", id);
+                Thread thread = new Thread(new ThreadStart(() => {
+                    if (Server.ExecuteNonQuerySQL(cmd) == -1) {
+                        HandyControl.Controls.MessageBox.Error("删除摄像头失败", "网络错误");
+                    }
+                    else {
+                        HandyControl.Controls.MessageBox.Success("删除摄像头成功", "提示");
+                        CameraItemViewModel.CameraViewModel.SycCameraView();
+                    }
+                    Application.Current.Dispatcher.Invoke(new Action(() => {
+                        this.Close();
+                    }));
+                }));
+                thread.IsBackground = true;
+                thread.Start();
+            }
+        }
     }
 }

@@ -1,6 +1,7 @@
 ﻿using HandyControl.Controls;
 using MySql.Data.MySqlClient;
 using System;
+using System.Data;
 using System.Threading;
 using System.Xml;
 
@@ -28,12 +29,14 @@ namespace StarEyes_GUI.Utils {
                     }
                 }
                 else if (_connection.State == System.Data.ConnectionState.Closed) {
+                    Console.WriteLine("连接关闭");
                     if (ReOpenConnection(3)) {
                         return _connection;
                     }
                     else return null;
                 }
-                else return _connection;
+                else if (_connection.State == ConnectionState.Open) return _connection;
+                else return null;
             }
             
             set {
@@ -65,8 +68,7 @@ namespace StarEyes_GUI.Utils {
                         return true;
                     }
                     catch (MySqlException ex) {
-                        Console.WriteLine("数据库连接失败！剩余自动重连次数：" + times.ToString());
-                        if (times == 0) HandleException(ex);
+                        Console.WriteLine("数据库连接失败：[" + ex.Number + "]" + ex.Message + "剩余自动重连次数：" + times.ToString());
                         Thread.Sleep(1000);
                         return ReOpenConnection(times);
                     }
@@ -79,12 +81,23 @@ namespace StarEyes_GUI.Utils {
         }
 
         /// <summary>
-        /// 数据库操作异常处理
+        /// 执行查询类的数据库操作
         /// </summary>
-        /// <param name="ex"></param>
-        public void HandleException(MySqlException ex) {
-            if (ex.Number == 1042) MessageBox.Error("无法连接服务器，请检查网络设置！", "网络错误");
-            else Console.WriteLine("[" + ex.Number + "]" + ex.Message);
+        /// <param name="cmd"></param>
+        /// <returns></returns>
+        public MySqlDataReader GetSQLReader(string cmd) {
+            if (connection != null) {
+                MySqlCommand Cmd = new(cmd, connection);
+                try {
+                    Console.WriteLine("开始执行 " + cmd);
+                    return Cmd.ExecuteReader();
+                }
+                catch (MySqlException ex) {
+                    Console.WriteLine("数据库操作异常：[" + ex.Number + "]" + ex.Message);
+                    return null;
+                }
+            }
+            else return null;
         }
 
         /// <summary>
@@ -96,34 +109,35 @@ namespace StarEyes_GUI.Utils {
             if (connection != null) {
                 MySqlCommand Cmd = new(cmd, connection);
                 try {
+                    Console.WriteLine("开始执行 " + cmd);
                     return Cmd.ExecuteNonQuery(); ;
                 }
                 catch (MySqlException ex) {
-                    HandleException(ex);
+                    Console.WriteLine("数据库操作异常：[" + ex.Number + "]" + ex.Message);
                     return -1;
                 }
             }
             else return -1;
         }
 
-        /// <summary>
-        /// 执行查询类的数据库操作
-        /// </summary>
-        /// <param name="cmd"></param>
-        /// <returns></returns>
-        public MySqlDataReader GetSQLReader(string cmd) {
-            if (connection != null) {
-                MySqlCommand Cmd = new(cmd, connection);
-                try {
-                    return Cmd.ExecuteReader();
+        public int ExecuteNonQuerySQL(string[] cmds) {
+            int rows = 0;
+            for (int i = 0; i < cmds.Length; i++) {
+                if (connection != null) {
+                    MySqlCommand Cmd = new(cmds[i], connection);
+                    try {
+                        Console.WriteLine("开始执行 " + cmds[i]);
+                        rows += Cmd.ExecuteNonQuery();
+                    }
+                    catch (MySqlException ex) {
+                        Console.WriteLine("数据库操作异常：[" + ex.Number + "]" + ex.Message);
+                        return -1;
+                    }
                 }
-                catch (MySqlException ex) {
-                    HandleException(ex);
-                    return null;
-                }
+                else return -1;
             }
-            else return null;
+            return rows;
         }
-        
+
     }
 }
