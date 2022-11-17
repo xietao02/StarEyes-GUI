@@ -1,17 +1,14 @@
 ﻿using System.Windows;
 using System.Windows.Controls;
-using static StarEyes_GUI.UserControls.SideBar;
+using static StarEyes_GUI.UserControls.Sidebar;
 
 namespace StarEyes_GUI.UserControls {
     /// <summary>
-    /// SideBarItem.xaml 的交互逻辑
+    /// SidebarItem.xaml 的交互逻辑
     /// </summary>
-    public partial class SideBarItem : UserControl {
-        public SideBarItem() {
-            InitializeComponent();
-            DataContext = this;
-        }
-
+    public partial class SidebarItem : UserControl {
+        
+        #region SidebarItem 属性
         public string ItemName { get; set; }
         public int ItemIndex { get; set; }
 
@@ -24,7 +21,7 @@ namespace StarEyes_GUI.UserControls {
         }
 
         public static readonly DependencyProperty ItemWidthProperty =
-            DependencyProperty.Register("ItemWidth", typeof(string), typeof(SideBarItem), new PropertyMetadata("200"));
+            DependencyProperty.Register("ItemWidth", typeof(string), typeof(SidebarItem), new PropertyMetadata("200"));
 
 
         /// <summary>
@@ -36,11 +33,21 @@ namespace StarEyes_GUI.UserControls {
         }
 
         public static readonly DependencyProperty IconSrcProperty =
-            DependencyProperty.Register("IconSrc", typeof(string), typeof(SideBarItem),
+            DependencyProperty.Register("IconSrc",
+                typeof(string),
+                typeof(SidebarItem),
                 new PropertyMetadata("/Assets/icons/bell.png"));
+        #endregion
 
+
+        /// <summary>
+        /// 构造函数
+        /// </summary>
+        public SidebarItem() {
+            InitializeComponent();
+            DataContext = this;
+        }
         
-
         /// <summary>
         /// 激发路由事件的方法。
         /// </summary>
@@ -48,12 +55,9 @@ namespace StarEyes_GUI.UserControls {
         /// <param name="e"></param>
         private void OnSwitch(object sender, RoutedEventArgs e) {
             SwitchEventArgs args = new SwitchEventArgs(SwitchEvent, this);
-            args.ItemIndex = this.ItemIndex;
-            this.RaiseEvent(args);
+            args.ItemIndex = ItemIndex;
+            RaiseEvent(args);
         }
 
     }
-    
-    
-
 }

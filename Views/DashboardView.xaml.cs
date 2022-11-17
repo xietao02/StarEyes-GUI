@@ -1,10 +1,8 @@
-﻿using HandyControl.Controls;
-using StarEyes_GUI.Models;
-using StarEyes_GUI.UserControls;
-using StarEyes_GUI.ViewModels;
+﻿using System;
 using System.Windows;
 using System.Windows.Controls;
-using static StarEyes_GUI.UserControls.SideBar;
+using StarEyes_GUI.ViewModels;
+using static StarEyes_GUI.UserControls.Sidebar;
 using Window = System.Windows.Window;
 
 namespace StarEyes_GUI.Views {
@@ -23,21 +21,23 @@ namespace StarEyes_GUI.Views {
             Switch += SwitchPageHandler;
 
             // 初始化 Header
-            DashboardViewModel.Header = new Header();
             theGrid.Children.Add(DashboardViewModel.Header);
             Grid.SetColumnSpan(DashboardViewModel.Header, 2);
 
             // 初始化 Sidebar
-            DashboardViewModel.Sidebar = new SideBar();
             theGrid.Children.Add(DashboardViewModel.Sidebar);
             Grid.SetRow(DashboardViewModel.Sidebar, 1);
 
-            // 初始化 Pages
-            DashboardViewModel.PagesPresenter = new PageTransition();
+            // 初始化 _pages
             theGrid.Children.Add(DashboardViewModel.PagesPresenter);
             Grid.SetRow(DashboardViewModel.PagesPresenter, 1);
             Grid.SetColumn(DashboardViewModel.PagesPresenter, 1);
 
+            Closed += DashboardView_Closed;
+        }
+
+        private void DashboardView_Closed(object sender, EventArgs e) {
+            Environment.Exit(0);
         }
 
         #region 切换页面
@@ -52,20 +52,21 @@ namespace StarEyes_GUI.Views {
         private void SwitchPageHandler(object sender, SwitchEventArgs args) {
             FrameworkElement element = sender as FrameworkElement;
             if(args.ItemIndex == -1) {
-                DashboardViewModel.loginView = new();
-                DashboardViewModel.loginView.Show();
+                DashboardViewModel.DestructDashboardVM();
+                DashboardViewModel.LoginView = new();
+                DashboardViewModel.LoginView.Show();
                 this.Close();
             }
             else if(args.ItemIndex == -2) {
                 DashboardViewModel.Sidebar.SwitchItem(2);
-                DashboardViewModel.PagesPresenter.SwitchPage(2);
+                DashboardViewModel.PagesPresenter.ToPage(2);
             }
             else if (args.ItemIndex == -4) {
                 DashboardViewModel.Sidebar.SwitchItem(4);
-                DashboardViewModel.PagesPresenter.SwitchPage(4);
+                DashboardViewModel.PagesPresenter.ToPage(4);
             }
-            else DashboardViewModel.PagesPresenter.SwitchPage(args.ItemIndex);
-            if (element == this.theGrid) {
+            else DashboardViewModel.PagesPresenter.ToPage(args.ItemIndex);
+            if (element == theGrid) {
                 args.Handled = true;
             } 
         }

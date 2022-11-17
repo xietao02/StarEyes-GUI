@@ -9,20 +9,15 @@
     d:DesignWidth="800"
     mc:Ignorable="d">
     <UserControl.Resources>
-        <Style BasedOn="{StaticResource BorderRegion}" TargetType="Border" 
-                x:Key="ItemBorder">
+        <Style
+            x:Key="ItemBorder"
+            BasedOn="{StaticResource BorderRegion}"
+            TargetType="Border">
             <Setter Property="Margin" Value="10,10,10,0" />
             <Setter Property="Width" Value="{Binding AboutViewModel.ItemWidth}" />
         </Style>
     </UserControl.Resources>
     <Grid>
-        <hc:ScrollViewer>
-            <WrapPanel x:Name="page">
-                <Button x:Name="bt" >Command</Button>
-                <Border Style="{StaticResource ItemBorder}">
-                    <Label>ItemBorder</Label>
-                </Border>
-            </WrapPanel>
-        </hc:ScrollViewer>
+        <hc:ScrollViewer />
     </Grid>
 </UserControl>

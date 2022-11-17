@@ -5,7 +5,7 @@ using System.Data;
 using System.Threading;
 using System.Xml;
 
-namespace StarEyes_GUI.Utils {
+namespace StarEyes_GUI.Common.Utils {
     /// <summary>
     /// 服务器连接
     /// </summary>
@@ -18,24 +18,24 @@ namespace StarEyes_GUI.Utils {
         /// 封装好的静态的数据库连接
         /// </summary>
         private static MySqlConnection _connection = null;
-        public MySqlConnection connection {
+        public MySqlConnection Connection {
             get {
                 if (_connection == null) {
                     if (InitConnection()) {
                         return _connection;
                     }
-                    else {
-                        return null;
-                    }
+                    else return null;
                 }
-                else if (_connection.State == System.Data.ConnectionState.Closed) {
+                else if (_connection.State == ConnectionState.Closed) {
                     Console.WriteLine("连接关闭");
                     if (ReOpenConnection(3)) {
                         return _connection;
                     }
                     else return null;
                 }
-                else if (_connection.State == ConnectionState.Open) return _connection;
+                else if (_connection.State == ConnectionState.Open) {
+                    return _connection;
+                }
                 else return null;
             }
             
@@ -44,6 +44,8 @@ namespace StarEyes_GUI.Utils {
             }
         }
 
+
+        #region 数据库使用方法
         /// <summary>
         /// 初始化数据库连接
         /// </summary>
@@ -86,8 +88,8 @@ namespace StarEyes_GUI.Utils {
         /// <param name="cmd"></param>
         /// <returns></returns>
         public MySqlDataReader GetSQLReader(string cmd) {
-            if (connection != null) {
-                MySqlCommand Cmd = new(cmd, connection);
+            if (Connection != null) {
+                MySqlCommand Cmd = new(cmd, Connection);
                 try {
                     Console.WriteLine("开始执行 " + cmd);
                     return Cmd.ExecuteReader();
@@ -106,8 +108,8 @@ namespace StarEyes_GUI.Utils {
         /// <param name="cmd"></param>
         /// <returns></returns>
         public int ExecuteNonQuerySQL(string cmd) {
-            if (connection != null) {
-                MySqlCommand Cmd = new(cmd, connection);
+            if (Connection != null) {
+                MySqlCommand Cmd = new(cmd, Connection);
                 try {
                     Console.WriteLine("开始执行 " + cmd);
                     return Cmd.ExecuteNonQuery(); ;
@@ -121,23 +123,26 @@ namespace StarEyes_GUI.Utils {
         }
 
         public int ExecuteNonQuerySQL(string[] cmds) {
-            int rows = 0;
-            for (int i = 0; i < cmds.Length; i++) {
-                if (connection != null) {
-                    MySqlCommand Cmd = new(cmds[i], connection);
-                    try {
-                        Console.WriteLine("开始执行 " + cmds[i]);
-                        rows += Cmd.ExecuteNonQuery();
-                    }
-                    catch (MySqlException ex) {
-                        Console.WriteLine("数据库操作异常：[" + ex.Number + "]" + ex.Message);
-                        return -1;
+            int rows = -1;
+            if (Connection != null) {
+                for (int i = 0; i < cmds.Length; i++) {
+                    if (cmds[i] != null) {
+                        MySqlCommand Cmd = new(cmds[i], Connection);
+                        try {
+                            Console.WriteLine("开始执行 " + cmds[i]);
+                            rows += Cmd.ExecuteNonQuery();
+                        }
+                        catch (MySqlException ex) {
+                            Console.WriteLine("数据库操作异常：[" + ex.Number + "]" + ex.Message);
+                            return -1;
+                        }
                     }
                 }
-                else return -1;
+                return rows;
             }
-            return rows;
+            else return -1;
         }
-
+        #endregion
+        
     }
 }

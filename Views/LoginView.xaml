@@ -32,9 +32,7 @@
             VerticalAlignment="Top"
             hc:InfoElement.Placeholder="请输入ID"
             KeyDown="Account_KeyDown"
-            Style="{DynamicResource TextBoxExtend}"
-            Text="{Binding LoginViewModel.ID}"
-            TextChanged="Account_TextChanged" />
+            Style="{DynamicResource TextBoxExtend}" />
         <PasswordBox
             x:Name="Password"
             Width="150"
@@ -44,7 +42,6 @@
             hc:InfoElement.Placeholder="请输入密码"
             hc:PasswordBoxAttach.PasswordLength="0"
             KeyDown="Password_KeyDown"
-            PasswordChanged="PasswordChanged"
             PasswordChar="●"
             Style="{DynamicResource PasswordBoxExtend}" />
         <Image
@@ -64,52 +61,46 @@
             Foreground="#FFE3E9F3"
             Text="StarEyes" />
         <TextBlock
-            x:Name="ID_null"
             Margin="497,308,0,0"
             HorizontalAlignment="Left"
             VerticalAlignment="Top"
             Foreground="#FFFF8585"
             Text="ID不能为空"
             TextWrapping="Wrap"
-            Visibility="Hidden" />
+            Visibility="{Binding LoginViewModel.ID_Null}" />
         <TextBlock
-            x:Name="PW_null"
             Margin="497,370,0,0"
             HorizontalAlignment="Left"
             VerticalAlignment="Top"
             Foreground="#FFFF8585"
             Text="密码不能为空"
             TextWrapping="Wrap"
-            Visibility="Hidden" />
+            Visibility="{Binding LoginViewModel.PW_NULL}" />
         <TextBlock
-            x:Name="ID_error"
             Margin="497,308,0,0"
             HorizontalAlignment="Left"
             VerticalAlignment="Top"
             Foreground="#FFFF8585"
             Text="ID为5位数字"
             TextWrapping="Wrap"
-            Visibility="Hidden" />
+            Visibility="{Binding LoginViewModel.ID_Error}" />
         <TextBlock
-            x:Name="Auth_error"
             Margin="497,370,0,0"
             HorizontalAlignment="Left"
             VerticalAlignment="Top"
             Foreground="#FFFF8585"
             Text="密码或密码错误"
             TextWrapping="Wrap"
-            Visibility="Hidden" />
+            Visibility="{Binding LoginViewModel.Auth_Error}" />
         <TextBlock
-            x:Name="Network_error"
             Margin="497,370,0,0"
             HorizontalAlignment="Left"
             VerticalAlignment="Top"
             Foreground="#FFFF8585"
             Text="登录超时，请检查网络设置"
             TextWrapping="Wrap"
-            Visibility="Hidden"/>
+            Visibility="{Binding LoginViewModel.Network_Error}" />
         <hc:LoadingCircle
-            x:Name="Loading"
             Width="56"
             Height="56"
             HorizontalAlignment="Center"
@@ -118,6 +109,6 @@
             DotDiameter="8"
             DotSpeed="4"
             Foreground="#FFBCC9F3"
-            Visibility="Hidden" />
+            Visibility="{Binding LoginViewModel.Loading}" />
     </Grid>
 </Window>

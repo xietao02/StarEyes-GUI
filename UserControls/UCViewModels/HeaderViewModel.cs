@@ -1,83 +1,84 @@
-﻿using StarEyes_GUI.Models;
-using StarEyes_GUI.Utils;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading;
-using System.Threading.Tasks;
+﻿using System.Threading;
+using StarEyes_GUI.Common.Data;
+using StarEyes_GUI.Common.Utils;
 
 namespace StarEyes_GUI.UserControls.UCViewModels {
     public class HeaderViewModel : NotificationObject {
+        private Thread _flickerNotification;
 
         #region 依赖属性
-        private string _UserToolTip;
+        private string _userToolTip;
         public string UserToolTip {
-            get { return _UserToolTip; }
+            get { return _userToolTip; }
             set {
-                _UserToolTip = value;
+                _userToolTip = value;
                 RaisePropertyChanged("UserToolTip");
             }
         }
 
-        private string _NotifToolTip;
+        private string _notifToolTip;
         public string NotifToolTip {
-            get { return _NotifToolTip; }
+            get { return _notifToolTip; }
             set {
-                _NotifToolTip = value;
+                _notifToolTip = value;
                 RaisePropertyChanged("NotifToolTip");
             }
         }
 
-        private string _BellSrc;
+        private string _bellSrc;
         public string BellSrc {
-            get { return _BellSrc; }
+            get { return _bellSrc; }
             set {
-                _BellSrc = value;
+                _bellSrc = value;
                 RaisePropertyChanged("BellSrc");
             }
         }
 
-        private string _Twinkling;
+        private string _twinkling;
         public string Twinkling {
-            get { return _Twinkling; }
+            get { return _twinkling; }
             set {
-                _Twinkling = value;
+                _twinkling = value;
                 RaisePropertyChanged("Twinkling");
             }
         }
 
         #endregion
 
+        #region 方法
+        /// <summary>
+        /// 构造函数
+        /// </summary>
         public HeaderViewModel() {
             CheckEventNum();
             Twinkling = "Visible";
-            UserToolTip = "用户ID:" + StarEyesModel.ID;
+            UserToolTip = "用户ID:" + StarEyesData.ID;
         }
 
+        /// <summary>
+        /// 检查未处理事件数量
+        /// </summary>
         public void CheckEventNum() {
-            if (StarEyesModel.EventNum == 0) {
+            if (StarEyesData.UnhandledEventNum == 0) {
                 NotifToolTip = "没有事件待处理";
                 BellSrc = "/Assets/icons/bell.png";
+                if (_flickerNotification != null) _flickerNotification.Abort();
             }
             else {
-                NotifToolTip = "有" + StarEyesModel.EventNum.ToString() + "件事件未处理！";
+                NotifToolTip = "有" + StarEyesData.UnhandledEventNum.ToString() + "件事件未处理！";
                 BellSrc = "/Assets/icons/bell-active.png";
-
-                Thread thread = new Thread(new ThreadStart(NotifTwinkling));
-                thread.IsBackground = true;
-                thread.Start();
+                _flickerNotification = new Thread(() => {
+                    while (StarEyesData.UnhandledEventNum != 0) {
+                        Thread.Sleep(500);
+                        Twinkling = "Hidden";
+                        Thread.Sleep(500);
+                        Twinkling = "Visible";
+                    }
+                });
+                _flickerNotification.IsBackground = true;
+                _flickerNotification.Start();
             }
         }
-
-        private void NotifTwinkling() {
-            while (StarEyesModel.EventNum != 0) {
-                Thread.Sleep(500);
-                Twinkling = "Hidden";
-                Thread.Sleep(500);
-                Twinkling = "Visible";
-            }
-        }
-
+        #endregion
     }
 }

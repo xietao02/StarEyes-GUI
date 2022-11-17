@@ -1,27 +1,47 @@
-﻿using StarEyes_GUI.Models;
-using StarEyes_GUI.Utils;
+﻿using System;
 using System.Threading;
-using System.Device.Location;
-using System;
+using StarEyes_GUI.Common.Utils;
 using StarEyes_GUI.UserControls;
 using StarEyes_GUI.Views;
-using MySql.Data.MySqlClient;
-using System.Windows;
 
 namespace StarEyes_GUI.ViewModels {
     public class DashboardViewModel : NotificationObject {
-        public PageTransition PagesPresenter;
-        public Header Header;
-        public SideBar Sidebar;
-        public LoginView loginView;
+        public PagesPresenter PagesPresenter = new();
+        public Header Header = new();
+        public Sidebar Sidebar = new();
+        public LoginView LoginView;
         private Thread StarEyesUpdateThread;
+
+        /// <summary>
+        /// 启动同步进程
+        /// </summary>
         private void StartUpdateThread() {
             StarEyesUpdateThread = new(new ThreadStart(() => {
-
+                bool isTipShown = false;
+                while (true) {
+                    Console.WriteLine("-=-=-=开始更新！=-=-=-");
+                    if (UpdateStarEyes()) {
+                        Console.WriteLine("-=-=-=更新成功！=-=-=-");
+                        isTipShown = false;
+                        Thread.Sleep(100000);
+                    }
+                    else {
+                        if (!isTipShown) {
+                            HandyControl.Controls.MessageBox.Error("无法连接服务器，数据同步失败！", "网络错误");
+                            isTipShown = true;
+                        }
+                        Console.WriteLine("-=-=-=更新失败！=-=-=-");
+                        Thread.Sleep(1000000);
+                    }
+                }
             }));
             StarEyesUpdateThread.IsBackground = true;
             StarEyesUpdateThread.Start();
         }
+
+        /// <summary>
+        /// 暂停同步进程
+        /// </summary>
         private void StopUpdateThread() {
             StarEyesUpdateThread.Abort();
         }
@@ -29,17 +49,23 @@ namespace StarEyes_GUI.ViewModels {
         /// <summary>
         /// 同步服务器函数
         /// </summary>
-        public void UpdateStarEyes() {
+        public bool UpdateStarEyes() {
+            bool UpdateStatus = false;
+
             // 同步 CameraView
-            //PagesPresenter.Pages[1];
-        }
-        
-        public DashboardViewModel() {
-            //StartUpdate();
+            UpdateStatus = PagesPresenter.CameraView.CameraViewModel.SycCameraView();
+            return UpdateStatus;
         }
 
-        ~DashboardViewModel() {
-            //StopUpdate();
+        public DashboardViewModel() {
+            StartUpdateThread();
+        }
+
+        public void DestructDashboardVM() {
+            StopUpdateThread();
+
+            // 关闭视频流
+            PagesPresenter.CameraView.CameraViewModel.CloseVideoStream();
         }
     }
 }

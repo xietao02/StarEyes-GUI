@@ -40,10 +40,9 @@
                             LineStroke="Gray"
                             LineStrokeThickness="2" />
                         <Button
-                            x:Name="AddCamera"
+                            x:Name="AddButton"
                             Height="40"
                             HorizontalAlignment="Right"
-                            Click="AddCamera_Click"
                             FontSize="17"
                             FontWeight="Bold"
                             Style="{StaticResource ButtonPrimary}">

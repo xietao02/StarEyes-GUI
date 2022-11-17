@@ -52,7 +52,6 @@
                     </ToolTip>
                 </Button.ToolTip>
                 <Image
-                    x:Name="bell"
                     Width="22"
                     Height="22"
                     Source="{Binding HeaderViewModel.BellSrc}"

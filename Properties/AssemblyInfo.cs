@@ -7,12 +7,12 @@ using System.Windows;
 // 有关程序集的一般信息由以下
 // 控制。更改这些特性值可修改
 // 与程序集关联的信息。
-[assembly: AssemblyTitle("StarEyes_GUI")]
-[assembly: AssemblyDescription("")]
+[assembly: AssemblyTitle("StarEyes")]
+[assembly: AssemblyDescription("StarEyes - 一套开源的智慧城市解决方案")]
 [assembly: AssemblyConfiguration("")]
-[assembly: AssemblyCompany("")]
+[assembly: AssemblyCompany("Lanzhou University")]
 [assembly: AssemblyProduct("StarEyes_GUI")]
-[assembly: AssemblyCopyright("Copyright ©  2022")]
+[assembly: AssemblyCopyright("© 2022 xietao, All rights reserved.")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
 

@@ -1,5 +1,5 @@
 ﻿<UserControl
-    x:Class="StarEyes_GUI.UserControls.SideBar"
+    x:Class="StarEyes_GUI.UserControls.Sidebar"
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
@@ -10,45 +10,45 @@
     mc:Ignorable="d">
     <Grid>
         <StackPanel
-            x:Name="Sidebar"
+            x:Name="theSidebar"
             Background="#3F72AF"
             Orientation="Vertical">
-            <uc:SideBarItem
-                x:Name="SideBarItem1"
+            <uc:SidebarItem
+                x:Name="SidebarItem1"
                 IconSrc="/Assets/icons/overview-active.png"
                 ItemIndex="0"
                 ItemName="概览"
-                ItemWidth="{Binding ActualWidth, ElementName=Sidebar}" />
-            <uc:SideBarItem
-                x:Name="SideBarItem2"
+                ItemWidth="{Binding ActualWidth, ElementName=theSidebar}" />
+            <uc:SidebarItem
+                x:Name="SidebarItem2"
                 IconSrc="/Assets/icons/camera.png"
                 ItemIndex="1"
                 ItemName="摄像头管理"
-                ItemWidth="{Binding ActualWidth, ElementName=Sidebar}" />
-            <uc:SideBarItem
-                x:Name="SideBarItem3"
+                ItemWidth="{Binding ActualWidth, ElementName=theSidebar}" />
+            <uc:SidebarItem
+                x:Name="SidebarItem3"
                 IconSrc="/Assets/icons/event.png"
                 ItemIndex="2"
                 ItemName="事件消息"
-                ItemWidth="{Binding ActualWidth, ElementName=Sidebar}" />
-            <uc:SideBarItem
-                x:Name="SideBarItem4"
+                ItemWidth="{Binding ActualWidth, ElementName=theSidebar}" />
+            <uc:SidebarItem
+                x:Name="SidebarItem4"
                 IconSrc="/Assets/icons/cpu.png"
                 ItemIndex="3"
                 ItemName="服务器管理"
-                ItemWidth="{Binding ActualWidth, ElementName=Sidebar}" />
-            <uc:SideBarItem
-                x:Name="SideBarItem5"
+                ItemWidth="{Binding ActualWidth, ElementName=theSidebar}" />
+            <uc:SidebarItem
+                x:Name="SidebarItem5"
                 IconSrc="/Assets/icons/user.png"
                 ItemIndex="4"
                 ItemName="个人信息管理"
-                ItemWidth="{Binding ActualWidth, ElementName=Sidebar}" />
-            <uc:SideBarItem
-                x:Name="SideBarItem6"
+                ItemWidth="{Binding ActualWidth, ElementName=theSidebar}" />
+            <uc:SidebarItem
+                x:Name="SidebarItem6"
                 IconSrc="/Assets/icons/more.png"
                 ItemIndex="5"
                 ItemName="关于"
-                ItemWidth="{Binding ActualWidth, ElementName=Sidebar}" />
+                ItemWidth="{Binding ActualWidth, ElementName=theSidebar}" />
         </StackPanel>
     </Grid>
 </UserControl>

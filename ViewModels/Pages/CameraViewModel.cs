@@ -1,51 +1,50 @@
-﻿using MySql.Data.MySqlClient;
-using StarEyes_GUI.Models;
-using StarEyes_GUI.UserControls;
-using StarEyes_GUI.UserControls.UCViewModels;
-using StarEyes_GUI.Utils;
-using System;
+﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Data;
+using MySql.Data.MySqlClient;
+using StarEyes_GUI.Common.Data;
+using StarEyes_GUI.Common.Utils;
+using StarEyes_GUI.UserControls;
+using StarEyes_GUI.UserControls.UCViewModels;
+using StarEyes_GUI.Views.Pages.Dialogs;
 
 namespace StarEyes_GUI.ViewModels.Pages {
     public class CameraViewModel : PageViewModelBase{
         public WrapPanel Page;
-        public List<CameraItem> CameraList = new();
-        private StarEyesServer Server = new();
-        public Binding binding;
-        public bool isAddViewShow = false;
+        private List<CameraItem> _cameraList = new();
+        private StarEyesServer _server = new();
+        private Binding _binding;
+        private AddCametaItemView _addCametaItemView;
+        public bool IsAddViewShow = false;
 
 
         #region 依赖属性
-        public string Info_AllCameraStatus { get; set; }
         public string Info_TotalCameraNum { get; set; }
-        public string Style_AllCameraStatus_BG { get; set; }
-        public string Style_AllCameraStatus_FG { get; set; }
+        public string Info_AllCameraStatus { get; set; } = "加载中...";
+        public string Style_AllCameraStatus_BG { get; set; } = "Black";
+        public string Style_AllCameraStatus_FG { get; set; } = "White";
         public string SwitchAllCameraStatusInfo { get; set; }
-        private int _TotalCameraNum;
+        private int _totalCameraNum;
         public int TotalCameraNum {
-            get { return _TotalCameraNum; }
+            get { return _totalCameraNum; }
             set {
-                _TotalCameraNum = value;
+                _totalCameraNum = value;
                 if(value == 0) {
                     SwitchAllCameraStatusInfo = "Hidden";
                 }
                 else SwitchAllCameraStatusInfo = "Visible";
-                Info_TotalCameraNum = "组织 [" + StarEyesModel.Organization + "] 摄像头总数：" + value;
+                Info_TotalCameraNum = "组织 [" + StarEyesData.Organization + "] 摄像头总数：" + value;
                 RaisePropertyChanged("Info_TotalCameraNum");
             }
         }
         
-        private int _BadConnCameraNum;
+        private int _badConnCameraNum;
         public int BadConnCameraNum {
-            get { return _BadConnCameraNum; }
+            get { return _badConnCameraNum; }
             set {
-                _BadConnCameraNum = value;
+                _badConnCameraNum = value;
                 if (value == 0) {
                     Info_AllCameraStatus = "所有摄像头连接正常";
                     Style_AllCameraStatus_FG = "White";
@@ -57,31 +56,47 @@ namespace StarEyes_GUI.ViewModels.Pages {
                     Style_AllCameraStatus_BG = "#eeb500";
                 }
                 RaisePropertyChanged("Info_AllCameraStatus");
+                RaisePropertyChanged("Style_AllCameraStatus_FG");
+                RaisePropertyChanged("Style_AllCameraStatus_BG");
             }
         }
-        public string Info_ComputerPosLat { get; set; } = "无法获取位置信息";
-        private string _ComputerPosLat = "0";
-        public string ComputerPosLat {
-            get { return _ComputerPosLat; }
+        public string Info_ComputerPosLat { get; set; } = "位置信息未知";
+        private double _computerPosLat = .0;
+        public double ComputerPosLat {
+            get { return _computerPosLat; }
             set {
-                _ComputerPosLat = value;
-                Info_ComputerPosLat = "默认使用当前位置经度：" + value;
+                _computerPosLat = value;
+                if (value == .0) {
+                    Info_ComputerPosLat = "位置信息未知";
+                }
+                else {
+                    Info_ComputerPosLat = "默认使用当前位置经度：" + value;
+                }
                 RaisePropertyChanged("Info_ComputerPosLat");
             }
         }
 
-        public string Info_ComputerPosLon { get; set; } = "无法获取位置信息";
-        private string _ComputerPosLon = "0";
-        public string ComputerPosLon {
-            get { return _ComputerPosLon; }
+        public string Info_ComputerPosLon { get; set; } = "位置信息未知";
+        private double _computerPosLon = .0;
+        public double ComputerPosLon {
+            get { return _computerPosLon; }
             set {
-                _ComputerPosLon = value;
-                Info_ComputerPosLon = "默认使用当前位置纬度：" + value ;
+                _computerPosLon = value;
+                if (value == .0) {
+                    Info_ComputerPosLon = "位置信息未知";
+                }
+                else {
+                    Info_ComputerPosLon = "默认使用当前位置纬度：" + value;
+                }
                 RaisePropertyChanged("Info_ComputerPosLon");
             }
         }
         #endregion
 
+        public CameraViewModel() {
+            _binding = new Binding("ItemWidth") { Source = this };
+        }
+        
         /// <summary>
         /// 同步服务器摄像头列表
         /// </summary>
@@ -90,16 +105,15 @@ namespace StarEyes_GUI.ViewModels.Pages {
             Application.Current.Dispatcher.Invoke(new Action(() => {
                 TotalCameraNum = 0;
                 BadConnCameraNum = 0;
-                string cmd = string.Format("SELECT * FROM cameras WHERE `organization`='{0}'", StarEyesModel.Organization);
-                MySqlDataReader reader = Server.GetSQLReader(cmd);
+                string cmd = string.Format("SELECT * FROM cameras WHERE `organization`='{0}'", StarEyesData.Organization);
+                MySqlDataReader reader = _server.GetSQLReader(cmd);
                 if (reader != null) {
-                    CameraList.Clear();
+                    _cameraList.Clear();
                     while (reader.Read()) {
                         CameraItemViewModel CameraItemViewModel = new(reader[0].ToString(), reader[1].ToString(), reader[3].ToString(), reader[4].ToString(),
                                             reader[5].ToString(), reader[6].ToString(), reader[7].ToString(), reader[8].ToString(), reader[9].ToString(), reader[10].ToString());
-                        CameraItemViewModel.CameraViewModel = this;
-                        CameraItem cameraItem = new(CameraItemViewModel, binding);
-                        CameraList.Add(cameraItem);
+                        CameraItem cameraItem = new(CameraItemViewModel, _binding);
+                        _cameraList.Add(cameraItem);
                         if (CameraItemViewModel.CameraStatus) {
                             TotalCameraNum++;
                         }
@@ -108,12 +122,13 @@ namespace StarEyes_GUI.ViewModels.Pages {
                         }
                     }
                     reader.Close();
-                    TotalCameraNum = CameraList.Count;
+                    TotalCameraNum = _cameraList.Count;
                     Console.WriteLine("Page旧摄像头数:" + (Page.Children.Count - 1));
                     Page.Children.RemoveRange(1, Page.Children.Count - 1);
                     Console.WriteLine("清除成功");
-                    CameraList.ForEach(theCameraItem => {
+                    _cameraList.ForEach(theCameraItem => {
                         Page.Children.Add(theCameraItem);
+                        Console.WriteLine("增加摄像头：" + theCameraItem.CameraItemViewModel.CameraName);
                     });
                     Result = true;
                 }
@@ -121,6 +136,36 @@ namespace StarEyes_GUI.ViewModels.Pages {
             }));
             return Result;
         }
-        
+
+        /// <summary>
+        ///  关闭未关闭的摄像流
+        /// </summary>
+        public void CloseVideoStream() {
+            _cameraList.ForEach(theCameraItem => {
+                if (theCameraItem.CameraItemViewModel.IsVLCOpen) {
+                    theCameraItem.CameraItemViewModel.ExecuteCloseVLC(null);
+                }
+            });
+        }
+
+        /// <summary>
+        /// 新增摄像头
+        /// </summary>
+        public DelegateCommand AddCameraItem => new DelegateCommand(ExecuteAddCameraItem, CanExecuteAddCameraItem);
+
+        void ExecuteAddCameraItem(object obj) {
+            IsAddViewShow = true;
+            _addCametaItemView = new(this);
+            _addCametaItemView.Show();
+        }
+
+        bool CanExecuteAddCameraItem(object obj) {
+            if (!IsAddViewShow) return true;
+            else {
+                HandyControl.Controls.MessageBox.Info("新增摄像头窗口已打开！", "提示");
+                return false;
+            }
+        }
+
     }
 }

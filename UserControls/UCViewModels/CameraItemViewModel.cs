@@ -1,14 +1,10 @@
-﻿using Org.BouncyCastle.Tls;
-using StarEyes_GUI.Utils;
+﻿using System;
+using System.IO;
+using System.Reflection;
+using System.Threading.Tasks;
+using StarEyes_GUI.Common.Utils;
 using StarEyes_GUI.ViewModels.Pages;
 using StarEyes_GUI.Views.Pages.Dialogs;
-using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
-using System.Reflection;
-using System.Text;
-using System.Threading.Tasks;
 using Vlc.DotNet.Wpf;
 
 namespace StarEyes_GUI.UserControls.UCViewModels {
@@ -17,38 +13,39 @@ namespace StarEyes_GUI.UserControls.UCViewModels {
 
         #region 摄像头属性
 
-        public bool canConnect = false;
-        public bool isVLCOpen = false;
-        public bool isEditViewShow = false;
+        public bool CanConnect = true;
+        public bool IsVLCOpen = false;
+        public bool IsEditViewShow = false;
         public VlcControl VLC;
-
-        Assembly currentAssembly;
-        string currentDirectory;
-        DirectoryInfo vlcLibDirectory;
-        string[] options = new string[] { "--file-logging", "-vvv", "--logfile=VLC.log" };
+        
+        private string _rtsp;
+        private Assembly _currentAssembly;
+        private string _currentDirectory;
+        private DirectoryInfo _vlcLibDirectory;
+        private string[] _options = new string[] { "--file-logging", "-vvv", "--logfile=VLC.log" };
         
         /// <summary>
         /// 摄像头名称
         /// </summary>
-        private string _CameraName;
+        private string _cameraName;
         public string CameraName {
-            get { return _CameraName; }
+            get { return _cameraName; }
             set {
-                _CameraName = value;
+                _cameraName = value;
                 RaisePropertyChanged("CameraName");
             }
         }
 
         /// <summary>
-        /// 摄像头 ID
+        /// 摄像头 id
         /// </summary>
         public string Info_CameraID { get; set; }
-        private string _CameraID;
+        private string _cameraID;
         public string CameraID {
-            get { return _CameraID; }
+            get { return _cameraID; }
             set {
-                _CameraID = value;
-                Info_CameraID = "ID：" + CameraID;
+                _cameraID = value;
+                Info_CameraID = "id：" + CameraID;
                 RaisePropertyChanged("Info_CameraID");
             }
         }
@@ -58,19 +55,19 @@ namespace StarEyes_GUI.UserControls.UCViewModels {
         /// </summary>
         public string Info_CameraStatus { get; set; }
         public string Status_Style { get; set; }
-        private bool _CameraStatus = false;
+        private bool _cameraStatus = false;
         public bool CameraStatus { 
             get {
-                return _CameraStatus;
+                return _cameraStatus;
             }
             set {
-                _CameraStatus = value;
+                _cameraStatus = value;
                 if (value) {
-                    Info_CameraStatus = "连接状态：" + "正常";
+                    Info_CameraStatus = "连接状态：正常";
                     Status_Style = "#29b94c";
                 }
                 else {
-                    Info_CameraStatus = "连接状态：" + "异常";
+                    Info_CameraStatus = "连接状态：异常";
                     Status_Style = "#dc303e";
                 }
                 RaisePropertyChanged("Info_CameraID");
@@ -82,11 +79,11 @@ namespace StarEyes_GUI.UserControls.UCViewModels {
         /// 摄像头检测事件数量
         /// </summary>
         public string Info_CameraEventNum { get; set; }
-        private string _CameraEventNum;
+        private string _cameraEventNum;
         public string CameraEventNum {
-            get { return _CameraEventNum; }
+            get { return _cameraEventNum; }
             set {
-                _CameraEventNum = value;
+                _cameraEventNum = value;
                 Info_CameraEventNum = String.Format("累计检测到 {0} 起事件。", value);
                 RaisePropertyChanged("Info_CameraEventNum");
                 RaisePropertyChanged("CameraEventNum");
@@ -94,20 +91,20 @@ namespace StarEyes_GUI.UserControls.UCViewModels {
         }
 
         /// <summary>
-        /// 摄像头 IP
+        /// 摄像头 ip
         /// </summary>
         public string Info_CameraIP { get; set; }
-        private string _CameraIP;
+        private string _cameraIP;
         public string CameraIP {
-            get { return _CameraIP; }
+            get { return _cameraIP; }
             set {
                 if (CameraStatus) {
-                    Info_CameraIP = "IP：" + value;
-                    _CameraIP = value;
+                    Info_CameraIP = "ip：" + value;
+                    _cameraIP = value;
                 }
                 else {
                     Info_CameraIP = "未能与摄像头建立连接";
-                    _CameraIP = "未知";
+                    _cameraIP = "未知";
                 }
                 RaisePropertyChanged("Info_CameraIP");
                 RaisePropertyChanged("CameraIP");
@@ -117,11 +114,11 @@ namespace StarEyes_GUI.UserControls.UCViewModels {
         /// <summary>
         /// 摄像头端口
         /// </summary>
-        private string _CameraPort;
+        private string _cameraPort;
         public string CameraPort {
-            get { return _CameraPort; }
+            get { return _cameraPort; }
             set {
-                _CameraPort = value;
+                _cameraPort = value;
                 RaisePropertyChanged("CameraPort");
             }
         }
@@ -129,24 +126,24 @@ namespace StarEyes_GUI.UserControls.UCViewModels {
         /// <summary>
         /// 摄像头 RTSP 账号
         /// </summary>
-        private string _RTSPAcount;
+        private string _rtspAcount;
         public string RTSPAcount {
-            get { return _RTSPAcount; }
+            get { return _rtspAcount; }
             set {
-                _RTSPAcount = value;
-                RaisePropertyChanged("RTSPAcount");
+                _rtspAcount = value;
+                RaisePropertyChanged("rtspAcount");
             }
         }
 
         /// <summary>
         /// 摄像头 RTSP 密码
         /// </summary>
-        private string _RTSPPassword;
+        private string _rtspPassword;
         public string RTSPPassword {
-            get { return _RTSPPassword; }
+            get { return _rtspPassword; }
             set {
-                _RTSPPassword = value;
-                RaisePropertyChanged("RTSPPassword");
+                _rtspPassword = value;
+                RaisePropertyChanged("rtspPassword");
             }
         }
 
@@ -154,35 +151,35 @@ namespace StarEyes_GUI.UserControls.UCViewModels {
         /// <summary>
         /// 摄像头地理位置
         /// </summary>
-        private string _Info_CameraPos;
+        private string _info_CameraPos;
         public string Info_CameraPos {
-            get { return _Info_CameraPos; }
+            get { return _info_CameraPos; }
             set {
                 string Lon, Lat;
                 if (CameraPosLon == "0") Lon = "未知";
                 else Lon = CameraPosLon;
                 if (CameraPosLat == "0") Lat = "未知";
                 else Lat = CameraPosLat;
-                _Info_CameraPos = String.Format("经纬度：({0}, {1})", Lon, Lat);
+                _info_CameraPos = String.Format("经纬度：({0}, {1})", Lon, Lat);
                 RaisePropertyChanged("Info_CameraPos");
             }
         }
 
-        private string _CameraPosLat;
+        private string _cameraPosLat;
         public string CameraPosLat {
-            get { return _CameraPosLat; }
+            get { return _cameraPosLat; }
             set {
-                _CameraPosLat = value;
+                _cameraPosLat = value;
                 Info_CameraPos = "update";
                 RaisePropertyChanged("CameraPosLat");
             }
         }
         
-        private string _CameraPosLon;
+        private string _cameraPosLon;
         public string CameraPosLon {
-            get { return _CameraPosLon; }
+            get { return _cameraPosLon; }
             set {
-                _CameraPosLon = value;
+                _cameraPosLon = value;
                 Info_CameraPos = "update";
                 RaisePropertyChanged("CameraPosLon");
             }
@@ -194,20 +191,20 @@ namespace StarEyes_GUI.UserControls.UCViewModels {
         /// </summary>
         public string SwitchOpenViewButton_Enable { get; set; }
 
-        private string _SwitchOpenViewButton;
+        private string _switchOpenViewButton;
         public string SwitchOpenViewButton {
-            get { return _SwitchOpenViewButton; }
+            get { return _switchOpenViewButton; }
             set {
-                _SwitchOpenViewButton = value;
+                _switchOpenViewButton = value;
                 RaisePropertyChanged("SwitchOpenViewButton");
             }
         }
 
-        private string _SwitchCloseViewButton = "False";
+        private string _switchCloseViewButton = "False";
         public string SwitchCloseViewButton {
-            get { return _SwitchCloseViewButton; }
+            get { return _switchCloseViewButton; }
             set {
-                _SwitchCloseViewButton = value;
+                _switchCloseViewButton = value;
                 RaisePropertyChanged("SwitchCloseViewButton");
             }
         }
@@ -221,22 +218,20 @@ namespace StarEyes_GUI.UserControls.UCViewModels {
         public DelegateCommand OpenVLC => new DelegateCommand(ExecuteOpenVLC, CanExecuteOpenVLC);
 
         void ExecuteOpenVLC(object obj) {
-            if (!isVLCOpen) {
-                isVLCOpen = true;
-                VLC.SourceProvider.CreatePlayer(vlcLibDirectory, options);
-                string rtsp = String.Format("rtsp://{0}:{1}@{2}:{3}/stream1&channel=1", RTSPAcount, RTSPPassword, CameraIP, CameraPort);
+            if (!IsVLCOpen) {
+                IsVLCOpen = true;
                 VLC.SourceProvider.MediaPlayer.Audio.Volume = 0;
-                VLC.SourceProvider.MediaPlayer.Play(new Uri(rtsp));
+                VLC.SourceProvider.MediaPlayer.Play(new Uri(_rtsp));
                 VLC.Visibility = System.Windows.Visibility.Visible;
                 SwitchOpenViewButton = "Hidden";
                 SwitchCloseViewButton = "Visible";
-                System.Diagnostics.Trace.WriteLine(rtsp);
+                System.Diagnostics.Trace.WriteLine(_rtsp);
             }
         }
 
         bool CanExecuteOpenVLC(object obj) {
             SwitchOpenViewButton = "Visible";
-            if (canConnect && CameraStatus) {
+            if (CanConnect && CameraStatus) {
                 SwitchOpenViewButton_Enable = "True";
                 return true;
             }
@@ -252,9 +247,9 @@ namespace StarEyes_GUI.UserControls.UCViewModels {
         /// </summary>
         public DelegateCommand CloseVLC => new DelegateCommand(ExecuteCloseVLC, CanExecuteCloseVLC);
 
-        void ExecuteCloseVLC(object obj) {
-            if (isVLCOpen) {
-                isVLCOpen = false;
+        public void ExecuteCloseVLC(object obj) {
+            if (IsVLCOpen) {
+                IsVLCOpen = false;
                 new Task(() => {
                     VLC.SourceProvider.MediaPlayer.Stop();
                 }).Start();
@@ -269,6 +264,9 @@ namespace StarEyes_GUI.UserControls.UCViewModels {
             return true;    
         }
 
+        /// <summary>
+        /// 切换视频流音频开关
+        /// </summary>
         public DelegateCommand SwitchVolume => new DelegateCommand(ExecuteSwitchVolume);
 
         void ExecuteSwitchVolume(object obj) {
@@ -280,28 +278,76 @@ namespace StarEyes_GUI.UserControls.UCViewModels {
                 VLC.SourceProvider.MediaPlayer.Audio.Volume = 0;
             }
         }
+
+
+        /// <summary>
+        /// 打开编辑窗口
+        /// </summary>
+        public DelegateCommand EditCamera => new DelegateCommand(ExecuteEditCamera, CanExecuteEditCamera);
+
+        void ExecuteEditCamera(object obj) {
+            IsEditViewShow = true;
+            EditCameraItemView editCameraItemView = new(this);
+            editCameraItemView.Show();
+        }
+
+        bool CanExecuteEditCamera(object obj) {
+            if (!IsEditViewShow) return true;
+            else {
+                HandyControl.Controls.MessageBox.Info("修改信息窗口已打开！", "提示");
+                return false;
+            }
+        }
         #endregion
+
+        #region 方法
 
         /// <summary>
         /// 构造函数
         /// </summary>
-        public CameraItemViewModel(string ID, string Name, string Status, string PosLon, string PosLat,
-                                    string IP, string Port, string RTSPAcount, string RTSPPassword, string EventNum) {
-            CameraID = ID;
-            if (Status == "1") CameraStatus = true;
-            else CameraStatus = false;
-            CameraName = Name;
-            CameraEventNum = EventNum;
-            CameraPosLat = PosLat;
-            CameraPosLon = PosLon;
-            CameraIP = IP;
-            CameraPort = Port;
-            this.RTSPAcount = RTSPAcount;
-            this.RTSPPassword = RTSPPassword;
+        public CameraItemViewModel(string id,
+            string name,
+            string status,
+            string posLon,
+            string posLat,
+            string ip,
+            string port,
+            string rtspAcount,
+            string rtspPassword,
+            string eventNum) {
+            CameraID = id;
+            CameraStatus = status == "1" ? true : false;
+            CameraName = name;
+            CameraEventNum = eventNum;
+            CameraPosLat = posLat;
+            CameraPosLon = posLon;
+            CameraIP = ip;
+            CameraPort = port;
+            RTSPAcount = rtspAcount;
+            RTSPPassword = rtspPassword;
 
-            currentAssembly = Assembly.GetEntryAssembly();
-            currentDirectory = new FileInfo(currentAssembly.Location).DirectoryName;
-            vlcLibDirectory = new DirectoryInfo(Path.Combine(currentDirectory, "libvlc", IntPtr.Size == 4 ? "win-x86" : "win-x64"));
+            _currentAssembly = Assembly.GetEntryAssembly();
+            _currentDirectory = new FileInfo(_currentAssembly.Location).DirectoryName;
+            _vlcLibDirectory = new DirectoryInfo(Path.Combine(_currentDirectory, "libvlc", IntPtr.Size == 4 ? "win-x86" : "win-x64"));
         }
+
+        /// <summary>
+        /// 初始化 VLC
+        /// </summary>
+        public void InitVLC(VlcControl vlc) {
+            VLC = vlc;
+            VLC.SourceProvider.CreatePlayer(_vlcLibDirectory, _options);
+            _rtsp = String.Format("_rtsp://{0}:{1}@{2}:{3}/stream1&channel=1",
+                RTSPAcount, RTSPPassword, CameraIP, CameraPort);
+            CheckVLCConnection();
+        }
+
+        /// <summary>
+        /// 检查 VLC 连接状态
+        /// </summary>
+        public void CheckVLCConnection() {
+            // todo
+        }
+        #endregion
     }
 }

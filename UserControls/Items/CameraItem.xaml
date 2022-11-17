@@ -37,9 +37,9 @@
                         LineStrokeThickness="2"
                         Orientation="Vertical" />
                     <Button
+                        x:Name="EditButton"
                         Height="32"
                         Margin="15,0,0,0"
-                        Click="Edit_Click"
                         Content="修改信息"
                         FontSize="15"
                         Style="{StaticResource ButtonPrimary}" />

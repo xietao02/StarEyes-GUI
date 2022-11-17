@@ -4,18 +4,17 @@ using System.Windows.Media;
 
 namespace StarEyes_GUI.UserControls {
     /// <summary>
-    /// SideBar.xaml 的交互逻辑
+    /// Sidebar.xaml 的交互逻辑
     /// </summary>
-    public partial class SideBar : UserControl {
-
-        int curIndex, lastIndex;
-        public SideBar() {
+    public partial class Sidebar : UserControl {
+        private int _curIndex = 0, _lastIndex;
+        public Sidebar() {
             InitializeComponent();
-            curIndex = 0;
-            SideBarItem1.bt.Foreground = new SolidColorBrush(Color.FromRgb(0xFF, 0xE4, 0x97));
+            SidebarItem1.bt.Foreground = new SolidColorBrush(Color.FromRgb(0xFF, 0xE4, 0x97));
             Switch += SwitchItemHandler;
         }
 
+        #region Switch 事件
         // 定义 SwitchEventHandler 委托
         public delegate void SwitchEventHandler(object sender, SwitchEventArgs args);
 
@@ -24,7 +23,7 @@ namespace StarEyes_GUI.UserControls {
             name: "Switch",
             routingStrategy: RoutingStrategy.Bubble,
             handlerType: typeof(SwitchEventHandler),
-            ownerType: typeof(SideBar));
+            ownerType: typeof(Sidebar));
 
         // 为路由事件添加 CLR 事件包装器, XAML 编辑器将使用此包装器来生成自动提示
         public event SwitchEventHandler Switch {
@@ -43,70 +42,73 @@ namespace StarEyes_GUI.UserControls {
             public SwitchEventArgs(RoutedEvent routedEvent, object source) : base(routedEvent, source) { }
             public int ItemIndex { get; set; }
         }
-        
-        #region 切换侧边栏项目高亮
+        #endregion
+
+        /// <summary>
+        /// 切换侧边栏项目高亮 
+        /// </summary>
+        /// <param name="newIndex"></param>
         public void SwitchItem(int newIndex) {
-            if (curIndex != newIndex) {
-                lastIndex = curIndex;
-                curIndex = newIndex;
-                switch (curIndex) {
+            if (_curIndex != newIndex) {
+                _lastIndex = _curIndex;
+                _curIndex = newIndex;
+                switch (_curIndex) {
                     case 0:
-                        SideBarItem1.IconSrc = "/Assets/icons/overview-active.png";
-                        SideBarItem1.bt.Foreground = new SolidColorBrush(Color.FromRgb(0xFF, 0xE4, 0x97));
+                        SidebarItem1.IconSrc = "/Assets/icons/overview-active.png";
+                        SidebarItem1.bt.Foreground = new SolidColorBrush(Color.FromRgb(0xFF, 0xE4, 0x97));
                         break;
                     case 1:
-                        SideBarItem2.IconSrc = "/Assets/icons/camera-active.png";
-                        SideBarItem2.bt.Foreground = new SolidColorBrush(Color.FromRgb(0xFF, 0xE4, 0x97));
+                        SidebarItem2.IconSrc = "/Assets/icons/camera-active.png";
+                        SidebarItem2.bt.Foreground = new SolidColorBrush(Color.FromRgb(0xFF, 0xE4, 0x97));
                         break;
                     case 2:
-                        SideBarItem3.IconSrc = "/Assets/icons/event-active.png";
-                        SideBarItem3.bt.Foreground = new SolidColorBrush(Color.FromRgb(0xFF, 0xE4, 0x97));
+                        SidebarItem3.IconSrc = "/Assets/icons/event-active.png";
+                        SidebarItem3.bt.Foreground = new SolidColorBrush(Color.FromRgb(0xFF, 0xE4, 0x97));
                         break;
                     case 3:
-                        SideBarItem4.IconSrc = "/Assets/icons/cpu-active.png";
-                        SideBarItem4.bt.Foreground = new SolidColorBrush(Color.FromRgb(0xFF, 0xE4, 0x97));
+                        SidebarItem4.IconSrc = "/Assets/icons/cpu-active.png";
+                        SidebarItem4.bt.Foreground = new SolidColorBrush(Color.FromRgb(0xFF, 0xE4, 0x97));
                         break;
                     case 4:
-                        SideBarItem5.IconSrc = "/Assets/icons/user-active.png";
-                        SideBarItem5.bt.Foreground = new SolidColorBrush(Color.FromRgb(0xFF, 0xE4, 0x97));
+                        SidebarItem5.IconSrc = "/Assets/icons/user-active.png";
+                        SidebarItem5.bt.Foreground = new SolidColorBrush(Color.FromRgb(0xFF, 0xE4, 0x97));
                         break;
                     case 5:
-                        SideBarItem6.IconSrc = "/Assets/icons/more-active.png";
-                        SideBarItem6.bt.Foreground = new SolidColorBrush(Color.FromRgb(0xFF, 0xE4, 0x97));
+                        SidebarItem6.IconSrc = "/Assets/icons/more-active.png";
+                        SidebarItem6.bt.Foreground = new SolidColorBrush(Color.FromRgb(0xFF, 0xE4, 0x97));
                         break;
                     default:
                         break;
                 }
-                switch (lastIndex) {
+                switch (_lastIndex) {
                     case 0:
-                        SideBarItem1.IconSrc = "/Assets/icons/overview.png";
-                        SideBarItem1.bt.Foreground = new SolidColorBrush(Color.FromRgb(0xE3, 0xE9, 0xF3));
+                        SidebarItem1.IconSrc = "/Assets/icons/overview.png";
+                        SidebarItem1.bt.Foreground = new SolidColorBrush(Color.FromRgb(0xE3, 0xE9, 0xF3));
                         break;
                     case 1:
-                        SideBarItem2.IconSrc = "/Assets/icons/camera.png";
-                        SideBarItem2.bt.Foreground = new SolidColorBrush(Color.FromRgb(0xE3, 0xE9, 0xF3));
+                        SidebarItem2.IconSrc = "/Assets/icons/camera.png";
+                        SidebarItem2.bt.Foreground = new SolidColorBrush(Color.FromRgb(0xE3, 0xE9, 0xF3));
                         break;
                     case 2:
-                        SideBarItem3.IconSrc = "/Assets/icons/event.png";
-                        SideBarItem3.bt.Foreground = new SolidColorBrush(Color.FromRgb(0xE3, 0xE9, 0xF3));
+                        SidebarItem3.IconSrc = "/Assets/icons/event.png";
+                        SidebarItem3.bt.Foreground = new SolidColorBrush(Color.FromRgb(0xE3, 0xE9, 0xF3));
                         break;
                     case 3:
-                        SideBarItem4.IconSrc = "/Assets/icons/cpu.png";
-                        SideBarItem4.bt.Foreground = new SolidColorBrush(Color.FromRgb(0xE3, 0xE9, 0xF3));
+                        SidebarItem4.IconSrc = "/Assets/icons/cpu.png";
+                        SidebarItem4.bt.Foreground = new SolidColorBrush(Color.FromRgb(0xE3, 0xE9, 0xF3));
                         break;
                     case 4:
-                        SideBarItem5.IconSrc = "/Assets/icons/user.png";
-                        SideBarItem5.bt.Foreground = new SolidColorBrush(Color.FromRgb(0xE3, 0xE9, 0xF3));
+                        SidebarItem5.IconSrc = "/Assets/icons/user.png";
+                        SidebarItem5.bt.Foreground = new SolidColorBrush(Color.FromRgb(0xE3, 0xE9, 0xF3));
                         break;
                     case 5:
-                        SideBarItem6.IconSrc = "/Assets/icons/more.png";
-                        SideBarItem6.bt.Foreground = new SolidColorBrush(Color.FromRgb(0xE3, 0xE9, 0xF3));
+                        SidebarItem6.IconSrc = "/Assets/icons/more.png";
+                        SidebarItem6.bt.Foreground = new SolidColorBrush(Color.FromRgb(0xE3, 0xE9, 0xF3));
                         break;
                     default:
                         break;
                 }
             }
         }
-        #endregion
     }
 }

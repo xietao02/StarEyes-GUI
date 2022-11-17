@@ -1,27 +1,13 @@
-﻿using HandyControl.Data;
-using Org.BouncyCastle.Utilities.Net;
-using StarEyes_GUI.UserControls;
-using StarEyes_GUI.UserControls.UCViewModels;
-using StarEyes_GUI.Utils;
-using StarEyes_GUI.ViewModels.Pages;
-using System;
+﻿using System;
 using System.Text.RegularExpressions;
 using System.Threading;
-using System.Threading.Tasks;
 using System.Windows;
-using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Documents;
-using System.Windows.Input;
-using System.Windows.Media;
-using System.Windows.Media.Imaging;
-using System.Windows.Media.Media3D;
-using System.Windows.Shapes;
-using static Org.BouncyCastle.Bcpg.Attr.ImageAttrib;
+using StarEyes_GUI.Common.Utils;
+using StarEyes_GUI.UserControls.UCViewModels;
 
 namespace StarEyes_GUI.Views.Pages.Dialogs {
     /// <summary>
-    /// EditCameraItemView.xaml 的交互逻辑
+    /// editCameraItemView.xaml 的交互逻辑
     /// </summary>
     public partial class EditCameraItemView : Window {
         public CameraItemViewModel CameraItemViewModel { get; set; }
@@ -249,7 +235,7 @@ namespace StarEyes_GUI.Views.Pages.Dialogs {
         }
 
         private void Window_Closed(object sender, EventArgs e) {
-            CameraItemViewModel.isEditViewShow = false;
+            CameraItemViewModel.IsEditViewShow = false;
         }
 
         private void ChangeInfo() {
@@ -317,7 +303,7 @@ namespace StarEyes_GUI.Views.Pages.Dialogs {
         }
 
         private void Delete_Click(object sender, RoutedEventArgs e) {
-            string ask = string.Format("删除摄像头[{0}](ID:{1})？", CameraItemViewModel.CameraName, id);
+            string ask = string.Format("删除摄像头[{0}](_id:{1})？", CameraItemViewModel.CameraName, id);
             if(HandyControl.Controls.MessageBox.Show(ask, "操作确认", MessageBoxButton.YesNo, MessageBoxImage.Question) == MessageBoxResult.Yes) {
                 string cmd = string.Format("DELETE FROM cameras WHERE(cam_id = '{0}' )", id);
                 Thread thread = new Thread(new ThreadStart(() => {
@@ -326,7 +312,7 @@ namespace StarEyes_GUI.Views.Pages.Dialogs {
                     }
                     else {
                         HandyControl.Controls.MessageBox.Success("删除摄像头成功", "提示");
-                        CameraItemViewModel.CameraViewModel.SycCameraView();
+                        // 发出更新事件
                     }
                     Application.Current.Dispatcher.Invoke(new Action(() => {
                         this.Close();

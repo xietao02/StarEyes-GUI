@@ -15,11 +15,6 @@ namespace StarEyes_GUI.Views.Pages {
             InitializeComponent();
             DataContext = this;
             SizeChanged += AboutViewModel.CalPageItemWidth;
-            this.bt.Command = AboutViewModel.cmd;
-            info a = new();
-            a.name = "xiaoming";
-            a.value = "boy";
-            this.bt.CommandParameter = a;
         }
     }
 }
