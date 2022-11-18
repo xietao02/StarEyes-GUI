@@ -6,6 +6,8 @@ using System.Windows;
 using MySql.Data.MySqlClient;
 using StarEyes_GUI.Common.Data;
 using StarEyes_GUI.Common.Utils;
+using StarEyes_GUI.UserControls;
+using StarEyes_GUI.UserControls.UCViewModels;
 using StarEyes_GUI.ViewModels.Pages;
 
 namespace StarEyes_GUI.Views.Pages.Dialogs {
@@ -282,11 +284,17 @@ namespace StarEyes_GUI.Views.Pages.Dialogs {
                     cmd = string.Format("INSERT INTO cameras (cam_id, cam_name, organization, status, pos_lon, pos_lat, ip, port, rtsp_acount, rtsp_password, event_num)" +
                     " VALUES ('{0}', '{1}', '{2}', '{3}', '{4}', '{5}', '{6}', '{7}', '{8}', '{9}', '{10}')",
                     cam_id, cam_name, organization, status, pos_lon, pos_lat, ip, port, rtsp_acount, rtsp_password, event_num);
-                    if (_server.ExecuteNonQuerySQL(cmd) == -1) Status = false;
-                    if (Status) HandyControl.Controls.MessageBox.Success("新增摄像头成功！摄像头 _id：" + cam_id, "提示");
-                    CameraViewModel.SycCameraView();
+                    if (_server.ExecuteNonQuerySQL(cmd) == 1) {
+                        CameraItemViewModel cameraItemViewModel = new(cam_id, cam_name, status, pos_lon, pos_lat, ip, port, rtsp_acount, rtsp_password, event_num);
+                        Application.Current.Dispatcher.Invoke(new Action(() => {
+                            CameraItem cameraItem = new(CameraViewModel, cameraItemViewModel, CameraViewModel.Binding);
+                            CameraViewModel.CameraList.Add(cameraItem);
+                            CameraViewModel.Page.Children.Add(cameraItem);
+                        }));
+                        HandyControl.Controls.MessageBox.Success("新增摄像头成功！摄像头 _id：" + cam_id, "提示");
+                    }
+                    else HandyControl.Controls.MessageBox.Error("新增摄像头失败！", "网络错误");
                 }
-                else HandyControl.Controls.MessageBox.Error("新增摄像头失败！", "网络错误");
             }));
             thread.IsBackground = true;
             thread.Start();

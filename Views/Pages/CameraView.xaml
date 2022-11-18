@@ -16,6 +16,13 @@
                     Width="{Binding CameraViewModel.ItemMaxWidth}"
                     Margin="10,10,10,0"
                     Style="{StaticResource BorderRegion}">
+                    <Border.Effect>
+                        <DropShadowEffect
+                            BlurRadius="16"
+                            Opacity=".3"
+                            ShadowDepth="6"
+                            Color="Gray" />
+                    </Border.Effect>
                     <StackPanel>
                         <Grid Margin="0,0,0,15">
                             <TextBlock

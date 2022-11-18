@@ -311,8 +311,8 @@ namespace StarEyes_GUI.Views.Pages.Dialogs {
                         HandyControl.Controls.MessageBox.Error("删除摄像头失败", "网络错误");
                     }
                     else {
+                        CameraItemViewModel.RequestDeletion(id);
                         HandyControl.Controls.MessageBox.Success("删除摄像头成功", "提示");
-                        // 发出更新事件
                     }
                     Application.Current.Dispatcher.Invoke(new Action(() => {
                         this.Close();

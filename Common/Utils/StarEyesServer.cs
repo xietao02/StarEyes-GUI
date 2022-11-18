@@ -27,7 +27,6 @@ namespace StarEyes_GUI.Common.Utils {
                     else return null;
                 }
                 else if (_connection.State == ConnectionState.Closed) {
-                    Console.WriteLine("连接关闭");
                     if (ReOpenConnection(3)) {
                         return _connection;
                     }
@@ -66,7 +65,6 @@ namespace StarEyes_GUI.Common.Utils {
                 if (_connection != null) {
                     try {
                         _connection.Open();
-                        Console.WriteLine("数据库连接成功！");
                         return true;
                     }
                     catch (MySqlException ex) {
@@ -91,7 +89,6 @@ namespace StarEyes_GUI.Common.Utils {
             if (Connection != null) {
                 MySqlCommand Cmd = new(cmd, Connection);
                 try {
-                    Console.WriteLine("开始执行 " + cmd);
                     return Cmd.ExecuteReader();
                 }
                 catch (MySqlException ex) {
@@ -111,7 +108,6 @@ namespace StarEyes_GUI.Common.Utils {
             if (Connection != null) {
                 MySqlCommand Cmd = new(cmd, Connection);
                 try {
-                    Console.WriteLine("开始执行 " + cmd);
                     return Cmd.ExecuteNonQuery(); ;
                 }
                 catch (MySqlException ex) {
@@ -129,7 +125,6 @@ namespace StarEyes_GUI.Common.Utils {
                     if (cmds[i] != null) {
                         MySqlCommand Cmd = new(cmds[i], Connection);
                         try {
-                            Console.WriteLine("开始执行 " + cmds[i]);
                             rows += Cmd.ExecuteNonQuery();
                         }
                         catch (MySqlException ex) {

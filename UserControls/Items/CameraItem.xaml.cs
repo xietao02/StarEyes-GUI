@@ -2,6 +2,7 @@
 using System.Windows.Controls;
 using System.Windows.Data;
 using StarEyes_GUI.UserControls.UCViewModels;
+using StarEyes_GUI.ViewModels.Pages;
 
 namespace StarEyes_GUI.UserControls {
     /// <summary>
@@ -32,14 +33,15 @@ namespace StarEyes_GUI.UserControls {
         /// </summary>
         /// <param name="cameraItemViewModel"></param>
         /// <param name="binding"></param>
-        public CameraItem(CameraItemViewModel cameraItemViewModel, Binding binding) {
+        public CameraItem(CameraViewModel cameraViewModel, CameraItemViewModel cameraItemViewModel, Binding binding) {
             InitializeComponent();
             CameraItemViewModel = cameraItemViewModel;
-            CameraItemViewModel.InitVLC(VLC);
+            CameraItemViewModel.CameraViewModel = cameraViewModel;
             DataContext = this;
+            CameraItemContent.Children.Add(CameraItemViewModel.VLC);
+            
             SetBinding(ItemWidthProperty, binding);
-            OpenView.Command = CameraItemViewModel.OpenVLC;
-            CloseView.Command = CameraItemViewModel.CloseVLC;
+            VLCButton.Command = CameraItemViewModel.SwitchVLC;
             VolumeButton.Command = CameraItemViewModel.SwitchVolume;
             VolumeButton.CommandParameter = VolumeButton;
             EditButton.Command = CameraItemViewModel.EditCamera;

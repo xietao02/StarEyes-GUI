@@ -6,23 +6,23 @@ using StarEyes_GUI.Views.Pages;
 
 namespace StarEyes_GUI.UserControls {
     /// <summary>
-    /// PagesPresenter.xaml 的交互逻辑
+    /// PagePresenter.xaml 的交互逻辑
     /// </summary>
-    public partial class PagesPresenter : UserControl {
+    public partial class PagePresenter : UserControl {
         private int _curIndex, _toIndex = 0;
         private UserControl[] _pages = new UserControl[6];
-        
+
         public OverviewView OverviewView = new OverviewView();
         public CameraView CameraView = new CameraView();
-        public EventView EventView  = new EventView();
+        public EventView EventView = new EventView();
         public ServerView ServerView = new ServerView();
         public UserView UserView = new UserView();
         public AboutView AboutView = new AboutView();
-        
+
         /// <summary>
         /// 构造函数
         /// </summary>
-        public PagesPresenter() {
+        public PagePresenter() {
             InitializeComponent();
             _pages[0] = OverviewView;
             _pages[1] = CameraView;
@@ -42,7 +42,7 @@ namespace StarEyes_GUI.UserControls {
         /// </summary>
         /// <param name="index"></param>
         public void ToPage(int index) {
-            if(_curIndex != index) {
+            if (_curIndex != index) {
                 _toIndex = index;
                 Application.Current.Dispatcher.Invoke(new Action(() => {
                     FadeOutPage();

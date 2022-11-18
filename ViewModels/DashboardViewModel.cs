@@ -6,7 +6,7 @@ using StarEyes_GUI.Views;
 
 namespace StarEyes_GUI.ViewModels {
     public class DashboardViewModel : NotificationObject {
-        public PagesPresenter PagesPresenter = new();
+        public PagePresenter PagesPresenter = new();
         public Header Header = new();
         public Sidebar Sidebar = new();
         public LoginView LoginView;
@@ -19,19 +19,16 @@ namespace StarEyes_GUI.ViewModels {
             StarEyesUpdateThread = new(new ThreadStart(() => {
                 bool isTipShown = false;
                 while (true) {
-                    Console.WriteLine("-=-=-=开始更新！=-=-=-");
                     if (UpdateStarEyes()) {
-                        Console.WriteLine("-=-=-=更新成功！=-=-=-");
                         isTipShown = false;
-                        Thread.Sleep(100000);
+                        Thread.Sleep(60000);
                     }
                     else {
                         if (!isTipShown) {
                             HandyControl.Controls.MessageBox.Error("无法连接服务器，数据同步失败！", "网络错误");
                             isTipShown = true;
                         }
-                        Console.WriteLine("-=-=-=更新失败！=-=-=-");
-                        Thread.Sleep(1000000);
+                        Thread.Sleep(10000);
                     }
                 }
             }));

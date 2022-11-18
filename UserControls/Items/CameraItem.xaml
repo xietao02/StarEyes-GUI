@@ -14,7 +14,14 @@
             Width="{Binding ItemWidth}"
             Margin="10"
             Style="{StaticResource BorderRegion}">
-            <StackPanel>
+            <Border.Effect>
+                <DropShadowEffect
+                    BlurRadius="16"
+                    Opacity=".3"
+                    ShadowDepth="6"
+                    Color="Gray" />
+            </Border.Effect>
+            <StackPanel x:Name="CameraItemContent">
                 <TextBlock
                     Margin="0,0,0,6"
                     HorizontalAlignment="Left"
@@ -43,71 +50,59 @@
                         Content="修改信息"
                         FontSize="15"
                         Style="{StaticResource ButtonPrimary}" />
-                    <Grid>
-                        <Button
-                            x:Name="OpenView"
-                            Height="32"
-                            Margin="15,0,0,0"
-                            HorizontalAlignment="Left"
-                            VerticalAlignment="Center"
-                            Content="浏览摄像头"
-                            FontSize="15"
-                            Style="{StaticResource ButtonPrimary}"
-                            Visibility="{Binding CameraItemViewModel.SwitchOpenViewButton}" />
-                        <Button
-                            x:Name="CloseView"
-                            Height="32"
-                            Margin="15,0,0,0"
-                            HorizontalAlignment="Left"
-                            VerticalAlignment="Center"
-                            Content="关闭摄像头"
-                            FontSize="15"
-                            Style="{StaticResource ButtonPrimary}"
-                            Visibility="{Binding CameraItemViewModel.SwitchCloseViewButton}" />
-                        <Label
-                            x:Name="Volume"
-                            Height="36"
-                            Margin="125,0,0,0"
-                            HorizontalAlignment="Left"
-                            VerticalAlignment="Center"
-                            Visibility="{Binding CameraItemViewModel.SwitchCloseViewButton}">
-                            <WrapPanel>
-                                <TextBlock
-                                    Margin="0,0,10,0"
-                                    VerticalAlignment="Center"
-                                    FontSize="15"
-                                    Foreground="#333333">
-                                    音量
-                                </TextBlock>
-                                <ToggleButton x:Name="VolumeButton" Style="{StaticResource ToggleButtonSwitch}" />
-                            </WrapPanel>
-                        </Label>
-                    </Grid>
-
+                    <Button
+                        x:Name="VLCButton"
+                        Height="32"
+                        Margin="15,0,0,0"
+                        HorizontalAlignment="Left"
+                        VerticalAlignment="Center"
+                        Content="{Binding CameraItemViewModel.VLCButtonContent}"
+                        FontSize="15"
+                        IsEnabled="{Binding CameraItemViewModel.VLCButtonEnable}"
+                        Style="{StaticResource ButtonPrimary}" />
+                    <Label
+                        x:Name="Volume"
+                        Height="36"
+                        Margin="15,0,0,0"
+                        HorizontalAlignment="Left"
+                        VerticalAlignment="Center"
+                        Visibility="{Binding CameraItemViewModel.VolumeButtonVisibility}">
+                        <WrapPanel>
+                            <TextBlock
+                                Margin="0,0,10,0"
+                                VerticalAlignment="Center"
+                                FontSize="15"
+                                Foreground="#333333">
+                                音量
+                            </TextBlock>
+                            <ToggleButton x:Name="VolumeButton" Style="{StaticResource ToggleButtonSwitch}" />
+                        </WrapPanel>
+                    </Label>
                 </WrapPanel>
                 <hc:Divider
-                    Margin="0,12,0,12"
+                    Margin="0,12,0,0"
                     LineStroke="Gray"
                     LineStrokeThickness="2" />
                 <WrapPanel>
                     <Label
+                        Margin="0,12,15,0"
                         Content="{Binding CameraItemViewModel.Info_CameraID}"
                         FontSize="16"
                         FontWeight="Bold" />
                     <Label
-                        Margin="15,0,0,0"
+                        Margin="0,12,15,0"
                         Content="{Binding CameraItemViewModel.Info_CameraIP}"
                         FontSize="16" />
                     <Label
-                        Margin="15,0,0,0"
+                        Margin="0,12,15,0"
                         Content="{Binding CameraItemViewModel.Info_CameraPos}"
                         FontSize="16" />
                 </WrapPanel>
                 <TextBlock
                     Margin="6,10,0,10"
-                    FontSize="18"
+                    FontSize="20"
+                    FontWeight="Bold"
                     Text="{Binding CameraItemViewModel.Info_CameraEventNum}" />
-                <vlc:VlcControl x:Name="VLC" />
             </StackPanel>
         </Border>
     </Grid>
