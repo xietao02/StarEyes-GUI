@@ -21,6 +21,7 @@
                 Margin="0,0,0,12"
                 hc:InfoElement.Placeholder="{Binding CameraItemViewModel.CameraName}"
                 hc:InfoElement.Title="摄像头名称"
+                KeyDown="CameraNameBox_KeyDown"
                 LostFocus="CameraNameBox_LostFocus"
                 ShowClearButton="True" />
             <WrapPanel>
@@ -30,6 +31,7 @@
                     Margin="7,0,0,12"
                     hc:InfoElement.Placeholder="{Binding CameraItemViewModel.CameraIP}"
                     hc:InfoElement.Title="局域网 IP"
+                    KeyDown="CameraIPBox_KeyDown"
                     LostFocus="CameraIPBox_LostFocus"
                     ShowClearButton="True" />
                 <hc:TextBox
@@ -38,17 +40,19 @@
                     Margin="40,0,0,12"
                     hc:InfoElement.Placeholder="{Binding CameraItemViewModel.CameraPort}"
                     hc:InfoElement.Title="端口号"
+                    KeyDown="CameraPortBox_KeyDown"
                     LostFocus="CameraPortBox_LostFocus"
                     ShowClearButton="True" />
             </WrapPanel>
             <WrapPanel>
                 <hc:TextBox
-                    x:Name="RTSPAcountBox"
+                    x:Name="RTSPAccountBox"
                     Width="170"
                     Margin="7,0,0,12"
                     hc:InfoElement.Placeholder="{Binding CameraItemViewModel.RTSPAcount}"
                     hc:InfoElement.Title="RTSP 用户名"
-                    LostFocus="RTSPAcountBox_LostFocus"
+                    KeyDown="RTSPAccountBox_KeyDown"
+                    LostFocus="RTSPAccountBox_LostFocus"
                     ShowClearButton="True" />
                 <hc:TextBox
                     x:Name="RTSPPasswordBox"
@@ -56,6 +60,7 @@
                     Margin="40,0,0,12"
                     hc:InfoElement.Placeholder="{Binding CameraItemViewModel.RTSPPassword}"
                     hc:InfoElement.Title="RTSP 密码"
+                    KeyDown="RTSPPasswordBox_KeyDown"
                     LostFocus="RTSPPasswordBox_LostFocus"
                     ShowClearButton="True" />
             </WrapPanel>
@@ -65,6 +70,7 @@
                 Margin="0,0,0,12"
                 hc:InfoElement.Placeholder="{Binding CameraItemViewModel.CameraEventNum}"
                 hc:InfoElement.Title="检测事件总数"
+                KeyDown="CameraEventNumBox_KeyDown"
                 LostFocus="CameraEventNumBox_LostFocus"
                 ShowClearButton="True" />
             <WrapPanel>
@@ -74,6 +80,7 @@
                     Margin="7,0,0,0"
                     hc:InfoElement.Placeholder="{Binding CameraItemViewModel.CameraPosLon}"
                     hc:InfoElement.Title="纬度"
+                    KeyDown="CameraPosLonBox_KeyDown"
                     LostFocus="CameraPosLonBox_LostFocus"
                     ShowClearButton="True" />
                 <hc:TextBox

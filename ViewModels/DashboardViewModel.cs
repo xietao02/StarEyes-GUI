@@ -19,16 +19,17 @@ namespace StarEyes_GUI.ViewModels {
             StarEyesUpdateThread = new(new ThreadStart(() => {
                 bool isTipShown = false;
                 while (true) {
+                    Console.WriteLine("开始更新");
                     if (UpdateStarEyes()) {
                         isTipShown = false;
-                        Thread.Sleep(60000);
+                        Thread.Sleep(10000);
                     }
                     else {
                         if (!isTipShown) {
                             HandyControl.Controls.MessageBox.Error("无法连接服务器，数据同步失败！", "网络错误");
                             isTipShown = true;
                         }
-                        Thread.Sleep(10000);
+                        Thread.Sleep(5000);
                     }
                 }
             }));

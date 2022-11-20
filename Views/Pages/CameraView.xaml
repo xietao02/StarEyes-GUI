@@ -11,10 +11,10 @@
     mc:Ignorable="d">
     <Grid>
         <hc:ScrollViewer>
-            <WrapPanel x:Name="page">
+            <WrapPanel x:Name="page" Margin="0,0,0,10">
                 <Border
                     Width="{Binding CameraViewModel.ItemMaxWidth}"
-                    Margin="10,10,10,0"
+                    Margin="10,20,10,20"
                     Style="{StaticResource BorderRegion}">
                     <Border.Effect>
                         <DropShadowEffect

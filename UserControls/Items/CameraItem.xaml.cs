@@ -45,6 +45,7 @@ namespace StarEyes_GUI.UserControls {
             VolumeButton.Command = CameraItemViewModel.SwitchVolume;
             VolumeButton.CommandParameter = VolumeButton;
             EditButton.Command = CameraItemViewModel.EditCamera;
+            UploadVideoButton.Command = CameraItemViewModel.UploadVideoStream;
         }
         
                 

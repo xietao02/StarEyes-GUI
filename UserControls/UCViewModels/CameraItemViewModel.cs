@@ -1,27 +1,33 @@
 ﻿using System;
 using System.IO;
-using System.Net.Sockets;
 using System.Net;
+using System.Net.Sockets;
 using System.Reflection;
+using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
+using System.Windows;
+using OpenCvSharp;
 using StarEyes_GUI.Common.Utils;
 using StarEyes_GUI.ViewModels.Pages;
 using StarEyes_GUI.Views.Pages.Dialogs;
 using Vlc.DotNet.Wpf;
-using System.Threading;
-using System.Text;
-using System.Windows.Media.Media3D;
-using Org.BouncyCastle.Tls;
-using System.Windows;
 
 namespace StarEyes_GUI.UserControls.UCViewModels {
     public class CameraItemViewModel : NotificationObject {
         public CameraViewModel CameraViewModel;
+        private Thread UploadVideoStreamThread;
 
         #region 摄像头属性
-        
+
         public bool IsVLCOpen = false;
         public bool IsEditViewShow = false;
+        private enum UploadStatusEnum {
+            cannotUpload,
+            notUpload,
+            uploadBySelf,
+            uploadByOther
+        }
         public VlcControl VLC;
 
         private string _rtsp;
@@ -69,17 +75,76 @@ namespace StarEyes_GUI.UserControls.UCViewModels {
             set {
                 _cameraStatus = value;
                 if (value) {
-                    Info_CameraStatus = "连接状态：正常";
+                    Info_CameraStatus = "状态：正常";
                     Status_Style = "#29b94c";
+                    if(UploadStatus == (int)UploadStatusEnum.notUpload || UploadStatus == (int)UploadStatusEnum.cannotUpload) {
+                        UploadStatus = (int)UploadStatusEnum.uploadByOther;
+                    }
                 }
                 else {
-                    Info_CameraStatus = "连接状态：异常";
+                    if(UploadStatus != (int)UploadStatusEnum.cannotUpload) {
+                        UploadStatus = (int)UploadStatusEnum.notUpload;
+                    }
+                    Info_CameraStatus = "状态：异常";
                     Status_Style = "#dc303e";
                 }
-                RaisePropertyChanged("Info_CameraID");
+                RaisePropertyChanged("Info_CameraStatus");
                 RaisePropertyChanged("Status_Style");
             }
         }
+
+        /// <summary>
+        /// 摄像头上传状态
+        /// </summary>
+        private int _uploadStatus = (int)UploadStatusEnum.notUpload;
+        public int UploadStatus {
+            get { return _uploadStatus; }
+            set {
+                _uploadStatus = value;
+                if(value == (int)UploadStatusEnum.cannotUpload) {
+                    UploadVideoButtonEnable = "True";
+                    UploadVideoButtonContent = "无法上传视频流 | 重试";
+                }
+                else if(value == (int)UploadStatusEnum.notUpload) {
+                    UploadVideoButtonEnable = "True";
+                    UploadVideoButtonContent = "上传视频流至服务器";
+                }
+                else if(value == (int)UploadStatusEnum.uploadBySelf) {
+                    UploadVideoButtonEnable = "True";
+                    UploadVideoButtonContent = "视频流上传中 | 停止";
+                }
+                else{
+                    UploadVideoButtonEnable = "False";
+                    UploadVideoButtonContent = "视频流已由其他客户端上传";
+                }
+            }
+        }
+
+        /// <summary>
+        /// 上传视频至服务器的按钮内容
+        /// </summary>
+        private string _uploadVideoButtonContent;
+        public string UploadVideoButtonContent {
+            get { return _uploadVideoButtonContent; }
+            set {
+                _uploadVideoButtonContent = value;
+                RaisePropertyChanged("UploadVideoButtonContent");
+            }
+        }
+
+        /// <summary>
+        /// 上传视频至服务器的按钮可用逻辑判断
+        /// </summary>
+        private string _uploadVideoButtonEnable;
+        public string UploadVideoButtonEnable {
+            get { return _uploadVideoButtonEnable; }
+            set {
+                _uploadVideoButtonEnable = value;
+                RaisePropertyChanged("UploadVideoButtonEnable");
+            }
+        }
+        
+        
 
         /// <summary>
         /// 摄像头检测事件数量
@@ -208,7 +273,9 @@ namespace StarEyes_GUI.UserControls.UCViewModels {
             }
         }
 
-
+        /// <summary>
+        /// 视频音量键 Visibility
+        /// </summary>
         private string _volumeButtonVisibility = "Hidden";
         public string VolumeButtonVisibility {
             get { return _volumeButtonVisibility; }
@@ -221,6 +288,54 @@ namespace StarEyes_GUI.UserControls.UCViewModels {
         #endregion
 
         #region 命令
+        /// <summary>
+        /// 上传视频至服务器
+        /// </summary>
+        public DelegateCommand UploadVideoStream => new DelegateCommand(ExecuteUploadVideoStream);
+
+        void ExecuteUploadVideoStream(object obj) {
+            if (UploadStatus == (int)UploadStatusEnum.notUpload || UploadStatus == (int)UploadStatusEnum.cannotUpload) {
+                UploadVideoButtonContent = "尝试上传视频流中";
+                Console.WriteLine("尝试上传视频流中");
+                new Task(() => {
+                    if (CheckVLCConnection()) {
+                        UploadStatus = (int)UploadStatusEnum.uploadBySelf;
+                        UploadVideoStreamThread = new Thread(new ThreadStart(() => {
+                            //VideoCapture videoCapture = new VideoCapture(_rtsp, VideoCaptureAPIs.FFMPEG);
+                            VideoCapture videoCapture = new VideoCapture(0, VideoCaptureAPIs.ANY);
+                            Mat frame = new Mat();
+                            //if (videoCapture.Open("rtsp://admin:Aa123456@192.168.1.105:554/stream1")) Console.WriteLine("连接成功");
+                            //else Console.WriteLine("连接失败");
+                            Console.WriteLine(_rtsp);
+                            string outputDir = "D:\\StayEyesVideos\\";
+                            int index = 0;
+                            while (true) {
+                                index++;
+                                VideoWriter videoWriter = new VideoWriter();
+                                videoWriter.Open(outputDir + index.ToString() + ".mp4", VideoWriter.FourCC('M', 'P', '4', 'V'), 30.0, new OpenCvSharp.Size(frame.Width, frame.Height), true);
+                                for (int frames = 150; frames > 0; frames--) {
+                                    if (videoCapture.Read(frame)) Console.WriteLine("yes");
+                                    else Console.WriteLine("no");
+                                    videoWriter.Write(frame);
+                                    Cv2.ImShow("Live", frame);
+                                    Console.WriteLine("width: " + frame.Width + " height: " + frame.Height);
+                                    Cv2.WaitKey(33);
+                                }
+                                Console.WriteLine("视频流上传成功" + index);
+                            }
+                        }));
+                        UploadVideoStreamThread.Start();
+                    }
+                    else {
+                        UploadStatus = (int)UploadStatusEnum.cannotUpload;
+                    }
+                }).Start();
+            }
+            else if (UploadStatus == (int)UploadStatusEnum.uploadBySelf) {
+                UploadVideoStreamThread.Abort();
+                UploadStatus = (int)UploadStatusEnum.notUpload;
+            }
+        }
 
         /// <summary>
         /// 开关摄像头视频画面
@@ -236,7 +351,7 @@ namespace StarEyes_GUI.UserControls.UCViewModels {
                     VLC.SourceProvider.MediaPlayer.Stop();
                 }).Start();
                 Application.Current.Dispatcher.Invoke(new Action(() => {
-                    VLC.Visibility = System.Windows.Visibility.Hidden;
+                    VLC.Visibility = Visibility.Hidden;
                 }));
                 VLCButtonContent = "打开视频";
             }
@@ -310,7 +425,7 @@ namespace StarEyes_GUI.UserControls.UCViewModels {
         /// </summary>
         public CameraItemViewModel(string id,
             string name,
-            string status,
+            string status,  // 服务器显示的摄像头状态
             string posLon,
             string posLat,
             string ip,
@@ -338,6 +453,7 @@ namespace StarEyes_GUI.UserControls.UCViewModels {
             }));
             _rtsp = String.Format("rtsp://{0}:{1}@{2}:{3}/stream1&channel=1",
                 RTSPAcount, RTSPPassword, CameraIP, CameraPort);
+            // 初始化时自动判断是否能连接上摄像头，检查摄像头上传状态
             new Task(() => {
                 VLCButtonEnable = "False";
                 if (CheckVLCConnection()) {
@@ -347,8 +463,10 @@ namespace StarEyes_GUI.UserControls.UCViewModels {
                 else {
                     VLCButtonEnable = "True";
                     VLCButtonContent = "无法建立RTSP会话 | 重试";
+                    UploadStatus = (int)UploadStatusEnum.cannotUpload;
                 }
             }).Start();
+            
         }
 
         /// <summary>
@@ -402,6 +520,7 @@ namespace StarEyes_GUI.UserControls.UCViewModels {
                     }
                 }
             }));
+
         }
         #endregion
     }

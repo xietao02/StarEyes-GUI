@@ -3,6 +3,7 @@ using System.Device.Location;
 using System.Text.RegularExpressions;
 using System.Threading;
 using System.Windows;
+using System.Windows.Input;
 using MySql.Data.MySqlClient;
 using StarEyes_GUI.Common.Data;
 using StarEyes_GUI.Common.Utils;
@@ -14,7 +15,7 @@ namespace StarEyes_GUI.Views.Pages.Dialogs {
     /// <summary>
     /// _addCametaItemView.xaml 的交互逻辑
     /// </summary>
-    public partial class AddCametaItemView : Window{
+    public partial class AddCametaItemView : Window {
         public CameraViewModel CameraViewModel { get; set; }
         private StarEyesServer _server = new();
         private GeoCoord _getGeoCoord = new();
@@ -54,8 +55,8 @@ namespace StarEyes_GUI.Views.Pages.Dialogs {
                 _nameFormat = false;
                 CameraNameBox.IsError = true;
             }
-            else if (CameraNameBox.Text.Length > 20) {
-                CameraNameBox.ErrorStr = "名称不能超过 20 个字符";
+            else if (CameraNameBox.Text.Length > 16) {
+                CameraNameBox.ErrorStr = "名称不能超过 16 个字符";
                 _nameFormat = false;
                 CameraNameBox.IsError = true;
             }
@@ -118,19 +119,19 @@ namespace StarEyes_GUI.Views.Pages.Dialogs {
             }
         }
 
-        private void RTSPAcountBox_LostFocus(object sender, RoutedEventArgs e) {
-            if (RTSPAcountBox.Text.Length == 0) {
+        private void RTSPAccountBox_LostFocus(object sender, RoutedEventArgs e) {
+            if (RTSPAccountBox.Text.Length == 0) {
                 _acountFormat = false;
-                RTSPAcountBox.IsError = true;
+                RTSPAccountBox.IsError = true;
             }
-            else if (RTSPAcountBox.Text.Length > 20) {
-                RTSPAcountBox.ErrorStr = "用户名不能超过 20 个字符";
+            else if (RTSPAccountBox.Text.Length > 16) {
+                RTSPAccountBox.ErrorStr = "用户名不能超过 16 个字符";
                 _acountFormat = false;
-                RTSPAcountBox.IsError = true;
+                RTSPAccountBox.IsError = true;
             }
             else {
                 _acountFormat = true;
-                RTSPAcountBox.IsError = false;
+                RTSPAccountBox.IsError = false;
             }
         }
 
@@ -139,8 +140,8 @@ namespace StarEyes_GUI.Views.Pages.Dialogs {
                 _passwordFormat = false;
                 RTSPPasswordBox.IsError = true;
             }
-            else if (RTSPPasswordBox.Text.Length > 20) {
-                RTSPPasswordBox.ErrorStr = "密码不能超过 20 个字符";
+            else if (RTSPPasswordBox.Text.Length > 16) {
+                RTSPPasswordBox.ErrorStr = "密码不能超过 16 个字符";
                 _passwordFormat = false;
                 RTSPPasswordBox.IsError = true;
             }
@@ -203,10 +204,21 @@ namespace StarEyes_GUI.Views.Pages.Dialogs {
         }
         #endregion
 
+        /// <summary>
+        /// 取消添加
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void Cancel_Click(object sender, RoutedEventArgs e) {
             Close();
         }
 
+        #region 确认添加摄像头
+        /// <summary>
+        /// 输入验证
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void Confirm_Click(object sender, RoutedEventArgs e) {
             if (!_nameFormat) {
                 CameraNameBox.Focus();
@@ -218,7 +230,7 @@ namespace StarEyes_GUI.Views.Pages.Dialogs {
                 CameraPortBox.Focus();
             }
             else if (!_acountFormat) {
-                RTSPAcountBox.Focus();
+                RTSPAccountBox.Focus();
             }
             else if (!_passwordFormat) {
                 RTSPPasswordBox.Focus();
@@ -235,23 +247,31 @@ namespace StarEyes_GUI.Views.Pages.Dialogs {
             }
         }
 
+        /// <summary>
+        /// 修改标志位
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void Window_Closed(object sender, EventArgs e) {
             CameraViewModel.IsAddViewShow = false;
         }
 
+        /// <summary>
+        /// 保存摄像头信息
+        /// </summary>
         private void SaveInfo() {
             string cmd;
             bool Status = true;
-            string cam_id = "-1", 
-                cam_name = CameraNameBox.Text, 
-                organization = StarEyesData.Organization, 
+            string cam_id = "-1",
+                cam_name = CameraNameBox.Text,
+                organization = StarEyesData.Organization,
                 status = "0",
-                pos_lon, 
-                pos_lat, 
-                ip = CameraIPBox.Text, 
+                pos_lon,
+                pos_lat,
+                ip = CameraIPBox.Text,
                 port = CameraPortBox.Text,
-                rtsp_acount = RTSPAcountBox.Text, 
-                rtsp_password = RTSPPasswordBox.Text, 
+                rtsp_acount = RTSPAccountBox.Text,
+                rtsp_password = RTSPPasswordBox.Text,
                 event_num = "0";
             if (CameraPosLonBox.Text.Length == 0) {
                 pos_lon = CameraViewModel.ComputerPosLon.ToString();
@@ -299,5 +319,46 @@ namespace StarEyes_GUI.Views.Pages.Dialogs {
             thread.IsBackground = true;
             thread.Start();
         }
+
+        #endregion
+
+
+        #region 快捷键跳转
+        private void CameraNameBox_KeyDown(object sender, System.Windows.Input.KeyEventArgs e) {
+            if (e.Key == Key.Enter || e.Key == Key.Return) {
+                CameraIPBox.Focus();
+            }
+        }
+
+        private void CameraIPBox_KeyDown(object sender, System.Windows.Input.KeyEventArgs e) {
+            if (e.Key == Key.Enter || e.Key == Key.Return) {
+                CameraPortBox.Focus();
+            }
+        }
+
+        private void CameraPortBox_KeyDown(object sender, System.Windows.Input.KeyEventArgs e) {
+            if (e.Key == Key.Enter || e.Key == Key.Return) {
+                RTSPAccountBox.Focus();
+            }
+        }
+
+        private void RTSPAccountBox_KeyDown(object sender, System.Windows.Input.KeyEventArgs e) {
+            if (e.Key == Key.Enter || e.Key == Key.Return) {
+                RTSPPasswordBox.Focus();
+            }
+        }
+
+        private void RTSPPasswordBox_KeyDown(object sender, System.Windows.Input.KeyEventArgs e) {
+            if (e.Key == Key.Enter || e.Key == Key.Return) {
+                CameraPosLonBox.Focus();
+            }
+        }
+
+        private void CameraPosLonBox_KeyDown(object sender, System.Windows.Input.KeyEventArgs e) {
+            if (e.Key == Key.Enter || e.Key == Key.Return) {
+                CameraPosLatBox.Focus();
+            }
+        }
+        #endregion
     }
 }
