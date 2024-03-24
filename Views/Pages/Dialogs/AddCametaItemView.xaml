@@ -70,7 +70,7 @@
                 Width="380"
                 Margin="0,0,0,12"
                 hc:InfoElement.Placeholder="{Binding CameraViewModel.Info_ComputerPosLon}"
-                hc:InfoElement.Title="纬度"
+                hc:InfoElement.Title="经度"
                 KeyDown="CameraPosLonBox_KeyDown"
                 LostFocus="CameraPosLonBox_LostFocus"
                 ShowClearButton="True" />
@@ -79,7 +79,7 @@
                 Width="380"
                 Margin="0,0,0,12"
                 hc:InfoElement.Placeholder="{Binding CameraViewModel.Info_ComputerPosLat}"
-                hc:InfoElement.Title="经度"
+                hc:InfoElement.Title="纬度"
                 LostFocus="CameraPosLatBox_LostFocus"
                 ShowClearButton="True" />
         </StackPanel>

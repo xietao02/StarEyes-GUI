@@ -1,15 +1,5 @@
-﻿using StarEyes_GUI.UserControls;
-using StarEyes_GUI.UserControls.UCViewModels;
-using StarEyes_GUI.ViewModels;
-using StarEyes_GUI.ViewModels.Pages;
-using StarEyes_GUI.Views.Pages.Dialogs;
-using System;
-using System.Collections;
-using System.Collections.Generic;
-using System.Threading;
-using System.Windows;
+﻿using StarEyes_GUI.ViewModels.Pages;
 using System.Windows.Controls;
-using System.Windows.Data;
 
 namespace StarEyes_GUI.Views.Pages {
     /// <summary>

@@ -152,53 +152,53 @@ namespace StarEyes_GUI.Views.Pages.Dialogs {
         }
 
         private void CameraPosLonBox_LostFocus(object sender, RoutedEventArgs e) {
-            CameraPosLonBox.ErrorStr = "纬度格式错误";
+            CameraPosLonBox.ErrorStr = "经度格式错误";
             if (CameraPosLonBox.Text.Length != 0) {
-                _posLonFormat = true;
-                double posLon;
-                if (double.TryParse(CameraPosLonBox.Text, out posLon)) {
-                    if (posLon < -90.0 || posLon > 90.0) {
-                        _posLonFormat = false;
+                _posLatFormat = true;
+                double posLat;
+                if (double.TryParse(CameraPosLonBox.Text, out posLat)) {
+                    if (posLat < -180.0 || posLat > 180.0) {
+                        _posLatFormat = false;
                         CameraPosLonBox.IsError = true;
                     }
                     else {
-                        _posLonFormat = true;
+                        _posLatFormat = true;
                         CameraPosLonBox.IsError = false;
                     }
                 }
                 else {
-                    _posLonFormat = false;
+                    _posLatFormat = false;
                     CameraPosLonBox.IsError = true;
                 }
             }
             else {
-                _posLonFormat = true;
-                CameraPosLonBox.IsError = false;
+                _posLatFormat = true;
+                CameraPosLatBox.IsError = false;
             }
         }
 
         private void CameraPosLatBox_LostFocus(object sender, RoutedEventArgs e) {
-            CameraPosLatBox.ErrorStr = "经度格式错误";
+            CameraPosLatBox.ErrorStr = "纬度格式错误";
             if (CameraPosLatBox.Text.Length != 0) {
-                _posLatFormat = true;
-                double posLat;
-                if (double.TryParse(CameraPosLatBox.Text, out posLat)) {
-                    if (posLat < -180.0 || posLat > 180.0) {
-                        _posLatFormat = false;
+                _posLonFormat = true;
+                double posLon;
+                if (double.TryParse(CameraPosLatBox.Text, out posLon)) {
+                    if (posLon < -90.0 || posLon > 90.0) {
+                        _posLonFormat = false;
                         CameraPosLatBox.IsError = true;
                     }
                     else {
-                        _posLatFormat = true;
+                        _posLonFormat = true;
                         CameraPosLatBox.IsError = false;
                     }
                 }
                 else {
-                    _posLatFormat = false;
+                    _posLonFormat = false;
                     CameraPosLatBox.IsError = true;
                 }
             }
             else {
-                _posLatFormat = true;
+                _posLonFormat = true;
                 CameraPosLatBox.IsError = false;
             }
         }
@@ -308,7 +308,7 @@ namespace StarEyes_GUI.Views.Pages.Dialogs {
                         CameraItemViewModel cameraItemViewModel = new(cam_id, cam_name, status, pos_lon, pos_lat, ip, port, rtsp_acount, rtsp_password, event_num);
                         Application.Current.Dispatcher.Invoke(new Action(() => {
                             CameraItem cameraItem = new(CameraViewModel, cameraItemViewModel, CameraViewModel.Binding);
-                            CameraViewModel.CameraList.Add(cameraItem);
+                            StarEyesData.CameraList.Add(cameraItem);
                             CameraViewModel.Page.Children.Add(cameraItem);
                         }));
                         HandyControl.Controls.MessageBox.Success("新增摄像头成功！摄像头 _id：" + cam_id, "提示");

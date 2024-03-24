@@ -13,14 +13,22 @@
             x:Key="ItemBorder"
             BasedOn="{StaticResource BorderRegion}"
             TargetType="Border">
-            <Setter Property="Margin" Value="10,10,10,0" />
+            <Setter Property="Margin" Value="10,10,10,10" />
             <Setter Property="Width" Value="{Binding ServerViewModel.ItemWidth}" />
+            <Setter Property="Effect">
+                <Setter.Value>
+                    <DropShadowEffect
+                        BlurRadius="16"
+                        Opacity=".3"
+                        ShadowDepth="6"
+                        Color="Gray" />
+                </Setter.Value>
+            </Setter>
         </Style>
     </UserControl.Resources>
-
     <Grid>
-        <hc:ScrollViewer>
-            <WrapPanel x:Name="page" />
-        </hc:ScrollViewer>
+        <Border Width="{Binding ServerViewModel.ItemMaxWidth}" Style="{StaticResource ItemBorder}">
+            <WebBrowser x:Name="browser" />
+        </Border>
     </Grid>
 </UserControl>

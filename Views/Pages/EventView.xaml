@@ -14,14 +14,95 @@
             x:Key="ItemBorder"
             BasedOn="{StaticResource BorderRegion}"
             TargetType="Border">
-            <Setter Property="Margin" Value="10,10,10,0" />
             <Setter Property="Width" Value="{Binding EventViewModel.ItemWidth}" />
+            <Setter Property="Effect">
+                <Setter.Value>
+                    <DropShadowEffect
+                        BlurRadius="16"
+                        Opacity=".3"
+                        ShadowDepth="6"
+                        Color="Gray" />
+                </Setter.Value>
+            </Setter>
         </Style>
     </UserControl.Resources>
     <Grid>
-        <hc:ScrollViewer>
-            <WrapPanel x:Name="page" />
-            <!--  使用DataGrid  -->
-        </hc:ScrollViewer>
+        <Border
+            Width="{Binding EventViewModel.ItemMaxWidth}"
+            Margin="0,10,0,20"
+            Style="{StaticResource ItemBorder}">
+            <StackPanel>
+                <TextBlock
+                    Margin="0,0,0,10"
+                    FontSize="28"
+                    FontWeight="Bold"
+                    Text="{Binding EventViewModel.EventCountInfo}" />
+                <DataGrid
+                    x:Name="AllEventList"
+                    AlternatingRowBackground="#f5f5f5"
+                    AutoGenerateColumns="False"
+                    Background="LightGray"
+                    IsReadOnly="True"
+                    RowBackground="#f5f5f5">
+                    <DataGrid.Columns>
+                        <DataGridTextColumn
+                            Width="*"
+                            Binding="{Binding eventID}"
+                            FontSize="14"
+                            Foreground="Black"
+                            Header="事件ID" />
+                        <DataGridTextColumn
+                            Width="*"
+                            Binding="{Binding type}"
+                            FontSize="14"
+                            Foreground="Black"
+                            Header="事件类型" />
+                        <DataGridTextColumn
+                            Width="*"
+                            Binding="{Binding cameraName}"
+                            FontSize="14"
+                            Foreground="Black"
+                            Header="捕获摄像头" />
+                        <DataGridTextColumn
+                            Width="*"
+                            MinWidth="170"
+                            Binding="{Binding time}"
+                            FontSize="14"
+                            Foreground="Black"
+                            Header="时间" />
+                        <DataGridTextColumn
+                            Width="*"
+                            Binding="{Binding status}"
+                            FontSize="14"
+                            Foreground="Black"
+                            Header="状态" />
+                        <DataGridTemplateColumn
+                            Width="*"
+                            MinWidth="210"
+                            Header="操作">
+                            <DataGridTemplateColumn.CellTemplate>
+                                <DataTemplate>
+                                    <WrapPanel HorizontalAlignment="Right">
+                                        <Button
+                                            x:Name="MarkBT"
+                                            HorizontalAlignment="Left"
+                                            Click="EventSolved"
+                                            Content="{Binding bt_content}"
+                                            Focusable="False"
+                                            IsEnabled="{Binding bt_enable}"
+                                            Style="{Binding bt_style}" />
+                                        <Button
+                                            Margin="10,0,0,0"
+                                            Content="查看事件视频"
+                                            Click="EventReview"
+                                            Style="{StaticResource ButtonInfo}" />
+                                    </WrapPanel>
+                                </DataTemplate>
+                            </DataGridTemplateColumn.CellTemplate>
+                        </DataGridTemplateColumn>
+                    </DataGrid.Columns>
+                </DataGrid>
+            </StackPanel>
+        </Border>
     </Grid>
 </UserControl>

@@ -33,6 +33,7 @@
                 FontWeight="Bold"
                 Foreground="#FFE3E9F3"
                 Text="智慧城市" />
+
             <Button
                 x:Name="Notif"
                 Width="40"
@@ -54,8 +55,7 @@
                 <Image
                     Width="22"
                     Height="22"
-                    Source="{Binding HeaderViewModel.BellSrc}"
-                    Visibility="{Binding HeaderViewModel.Twinkling}" />
+                    Source="{Binding HeaderViewModel.BellSrc}" />
             </Button>
             <Button
                 x:Name="User"

@@ -147,56 +147,57 @@ namespace StarEyes_GUI.Views.Pages.Dialogs {
         }
 
         private void CameraPosLonBox_LostFocus(object sender, RoutedEventArgs e) {
-            CameraPosLonBox.ErrorStr = "纬度格式错误";
+            CameraPosLonBox.ErrorStr = "经度格式错误";
             if (CameraPosLonBox.Text.Length != 0) {
-                posLonFormat = true;
-                double posLon;
-                if (double.TryParse(CameraPosLonBox.Text, out posLon)) {
-                    if (posLon < -90.0 || posLon > 90.0) {
-                        posLonFormat = false;
+                posLatFormat = true;
+                double posLat;
+                if (double.TryParse(CameraPosLonBox.Text, out posLat)) {
+                    if (posLat < -180.0 || posLat > 180.0) {
+                        posLatFormat = false;
                         CameraPosLonBox.IsError = true;
                     }
                     else {
-                        posLonFormat = true;
+                        posLatFormat = true;
                         CameraPosLonBox.IsError = false;
                     }
                 }
                 else {
-                    posLonFormat = false;
+                    posLatFormat = false;
                     CameraPosLonBox.IsError = true;
                 }
             }
             else {
-                posLonFormat = true;
+                posLatFormat = true;
                 CameraPosLonBox.IsError = false;
             }
         }
 
         private void CameraPosLatBox_LostFocus(object sender, RoutedEventArgs e) {
-            CameraPosLatBox.ErrorStr = "经度格式错误";
+            CameraPosLatBox.ErrorStr = "纬度格式错误";
             if (CameraPosLatBox.Text.Length != 0) {
-                posLatFormat = true;
-                double posLat;
-                if (double.TryParse(CameraPosLatBox.Text, out posLat)) {
-                    if (posLat < -180.0 || posLat > 180.0) {
-                        posLatFormat = false;
+                posLonFormat = true;
+                double posLon;
+                if (double.TryParse(CameraPosLatBox.Text, out posLon)) {
+                    if (posLon < -90.0 || posLon > 90.0) {
+                        posLonFormat = false;
                         CameraPosLatBox.IsError = true;
                     }
                     else {
-                        posLatFormat = true;
+                        posLonFormat = true;
                         CameraPosLatBox.IsError = false;
                     }
                 }
                 else {
-                    posLatFormat = false;
+                    posLonFormat = false;
                     CameraPosLatBox.IsError = true;
                 }
             }
             else {
-                posLatFormat = true;
+                posLonFormat = true;
                 CameraPosLatBox.IsError = false;
             }
         }
+
         #endregion
 
         /// <summary>

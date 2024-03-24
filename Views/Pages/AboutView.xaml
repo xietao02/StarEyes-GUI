@@ -13,11 +13,29 @@
             x:Key="ItemBorder"
             BasedOn="{StaticResource BorderRegion}"
             TargetType="Border">
-            <Setter Property="Margin" Value="10,10,10,0" />
             <Setter Property="Width" Value="{Binding AboutViewModel.ItemWidth}" />
+            <Setter Property="Effect">
+                <Setter.Value>
+                    <DropShadowEffect
+                        BlurRadius="16"
+                        Opacity=".3"
+                        ShadowDepth="6"
+                        Color="Gray" />
+                </Setter.Value>
+            </Setter>
         </Style>
     </UserControl.Resources>
     <Grid>
-        <hc:ScrollViewer />
+        <hc:ScrollViewer>
+            <Border
+                Width="{Binding AboutViewModel.ItemMaxWidth}"
+                Margin="10,10,10,20"
+                Style="{StaticResource ItemBorder}">
+                <TextBlock
+                    x:Name="aboutText"
+                    FontSize="20"
+                    FontWeight="Bold" />
+            </Border>
+        </hc:ScrollViewer>
     </Grid>
 </UserControl>

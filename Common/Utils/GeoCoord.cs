@@ -1,6 +1,10 @@
 ﻿using System;
 using System.Device.Location;
+using System.IO;
+using System.Net;
+using System.Text;
 using System.Threading;
+using Newtonsoft.Json.Linq;
 
 namespace StarEyes_GUI.Common.Utils {
     /// <summary>
@@ -41,6 +45,51 @@ namespace StarEyes_GUI.Common.Utils {
 
         public void Stop(object sender, EventArgs e) {
             _stop = true;
+        }
+
+        
+        public static string GetAddressJsonByLnLa(double lng, double lat, int timeout = 5000) {
+            const string key = "b45cb733044b39dfe55a3d1e4ea48424";
+            string url = $"http://restapi.amap.com/v3/geocode/regeo?key={key}&location={lng}, {lat}";
+            string json = "";
+            try {
+                if (WebRequest.Create(url) is HttpWebRequest req) {
+                    req.ContentType = "multipart/form-data";
+                    req.Accept = "*/*"; req.UserAgent = "";
+                    req.Timeout = timeout;
+                    req.Method = "GET";
+                    req.KeepAlive = true;
+                    if (req.GetResponse() is HttpWebResponse response)
+                        using (var sr = new StreamReader(response.GetResponseStream(), Encoding.UTF8)) {
+                            json = sr.ReadToEnd();
+                            return json;
+                        }
+                }
+            }
+            catch (Exception ex) {
+                System.Diagnostics.Debug.WriteLine(ex.ToString());
+                json = null;
+            }
+            return json;
+        }
+
+        public static string GetAddressByLnLa(double lon, double lat, int timeout = 5000) {
+            string jsonString = GetAddressJsonByLnLa(lon, lat, timeout);
+            if (jsonString != null) {
+                // 解析为JObject对象
+                JObject root = JObject.Parse(jsonString);
+                // 通过键值访问formatted_address
+                if (root != null) {
+                    var regeocode = root["regeocode"];
+                    if (regeocode != null && regeocode.Type != JTokenType.Null) {
+                        var result = regeocode["formatted_address"];
+                        if (result != null && result.Type != JTokenType.Null) {
+                            return (string)result;
+                        }
+                    }
+                }
+            }
+            return String.Format("经纬度:({0}, {1})", lon, lat);
         }
     }
 }

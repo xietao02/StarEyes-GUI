@@ -13,13 +13,90 @@
             x:Key="ItemBorder"
             BasedOn="{StaticResource BorderRegion}"
             TargetType="Border">
-            <Setter Property="Margin" Value="10,10,10,0" />
             <Setter Property="Width" Value="{Binding UserViewModel.ItemWidth}" />
+            <Setter Property="Effect">
+                <Setter.Value>
+                    <DropShadowEffect
+                        BlurRadius="16"
+                        Opacity=".3"
+                        ShadowDepth="6"
+                        Color="Gray" />
+                </Setter.Value>
+            </Setter>
         </Style>
     </UserControl.Resources>
     <Grid>
         <hc:ScrollViewer>
-            <WrapPanel x:Name="page" />
+            <Border
+                Width="{Binding UserViewModel.ItemMaxWidth}"
+                Margin="10,10,10,20"
+                Style="{StaticResource ItemBorder}">
+                <StackPanel>
+                    <TextBlock FontSize="30" FontWeight="Bold">个人信息</TextBlock>
+                    <hc:Divider
+                        Margin="0,12,0,10"
+                        LineStroke="Gray"
+                        LineStrokeThickness="2" />
+                    <DataGrid
+                        x:Name="UserInfo"
+                        AlternatingRowBackground="#f5f5f5"
+                        AutoGenerateColumns="False"
+                        Background="LightGray"
+                        IsHitTestVisible="False"
+                        IsReadOnly="True"
+                        RowBackground="#f5f5f5">
+                        <DataGrid.Columns>
+                            <DataGridTextColumn
+                                Width="*"
+                                Binding="{Binding ID}"
+                                FontSize="14"
+                                Foreground="Black"
+                                Header="账号ID" />
+                            <DataGridTextColumn
+                                Width="*"
+                                Binding="{Binding Name}"
+                                FontSize="14"
+                                Foreground="Black"
+                                Header="用户名" />
+                            <DataGridTextColumn
+                                Width="*"
+                                Binding="{Binding Organization}"
+                                FontSize="14"
+                                Foreground="Black"
+                                Header="所属组织" />
+                            <DataGridTextColumn
+                                Width="*"
+                                Binding="{Binding Wechat}"
+                                FontSize="14"
+                                Foreground="Black"
+                                Header="微信号" />
+                            <DataGridTextColumn
+                                Width="*"
+                                MinWidth="200"
+                                Binding="{Binding Email}"
+                                FontSize="14"
+                                Foreground="Black"
+                                Header="邮箱" />
+                            <DataGridTextColumn
+                                Width="*"
+                                Binding="{Binding Phone}"
+                                FontSize="14"
+                                Foreground="Black"
+                                Header="电话号码" />
+                        </DataGrid.Columns>
+                    </DataGrid>
+                    <Button
+                        Width="90"
+                        Height="35"
+                        Margin="0,10,0,0"
+                        HorizontalAlignment="Right"
+                        Click="ChangeInfo"
+                        FontSize="15"
+                        Style="{StaticResource ButtonPrimary}">
+                        编辑信息
+                    </Button>
+                </StackPanel>
+            </Border>
         </hc:ScrollViewer>
     </Grid>
 </UserControl>

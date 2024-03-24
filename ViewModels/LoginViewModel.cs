@@ -150,6 +150,11 @@ namespace StarEyes_GUI.ViewModels {
                     if (reader != null) {
                         if (reader.Read()) {
                             StarEyesData.ID = _id;
+                            StarEyesData.UserName = reader[2].ToString();
+                            StarEyesData.Wechat = reader[3].ToString();
+                            StarEyesData.Email = reader[4].ToString();
+                            StarEyesData.Phone = reader[5].ToString();
+                            StarEyesData.Organization = reader[6].ToString();
                             reader.Close();
                             return true;
                         }

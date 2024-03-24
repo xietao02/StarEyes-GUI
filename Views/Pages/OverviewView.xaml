@@ -5,6 +5,7 @@
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:hc="https://handyorg.github.io/handycontrol"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:src="clr-namespace:StarEyes_GUI.Common.Utils"
     d:DesignHeight="450"
     d:DesignWidth="800"
     mc:Ignorable="d">
@@ -13,13 +14,116 @@
             x:Key="ItemBorder"
             BasedOn="{StaticResource BorderRegion}"
             TargetType="Border">
-            <Setter Property="Margin" Value="10,10,10,0" />
+            <Setter Property="Margin" Value="10,10,10,10" />
             <Setter Property="Width" Value="{Binding OverviewViewModel.ItemWidth}" />
+            <Setter Property="Effect">
+                <Setter.Value>
+                    <DropShadowEffect
+                        BlurRadius="16"
+                        Opacity=".3"
+                        ShadowDepth="6"
+                        Color="Gray" />
+                </Setter.Value>
+            </Setter>
         </Style>
     </UserControl.Resources>
     <Grid>
-        <hc:ScrollViewer>
-            <WrapPanel x:Name="page" />
+        <hc:ScrollViewer x:Name="scrollViewer">
+            <WrapPanel x:Name="page">
+                <Border Width="{Binding OverviewViewModel.itemHalfWidth}" Style="{StaticResource ItemBorder}">
+                    <StackPanel>
+                        <TextBlock
+                            FontSize="25"
+                            FontWeight="Bold"
+                            Text="{Binding OverviewUserInfo}" />
+                        <TextBlock
+                            FontSize="25"
+                            FontWeight="Bold"
+                            Text="{Binding OverviewOrgInfo}" />
+                    </StackPanel>
+                </Border>
+                <Border Width="{Binding OverviewViewModel.itemHalfWidth}" Style="{StaticResource ItemBorder}">
+                    <StackPanel>
+                        <TextBlock
+                            FontSize="25"
+                            FontWeight="Bold"
+                            Text="{Binding OverviewViewModel.OverviewCamInfo}" />
+                        <TextBlock
+                            FontSize="25"
+                            FontWeight="Bold"
+                            Text="{Binding OverviewViewModel.OverviewEventInfo}" />
+                    </StackPanel>
+                </Border>
+                <Border
+                    Width="{Binding OverviewViewModel.ItemMaxWidth}"
+                    Height="340"
+                    Style="{StaticResource ItemBorder}">
+                    <Grid>
+                        <TextBlock
+                            Margin="24,0,0,0"
+                            FontSize="24"
+                            FontWeight="Bold">
+                            摄像头速览
+                        </TextBlock>
+                        <hc:ScrollViewer
+                            Width="180"
+                            Margin="0,40,0,0"
+                            HorizontalAlignment="Left">
+                            <StackPanel x:Name="mapList">
+                                <Label
+                                    Width="170"
+                                    Margin="-8,0,0,5"
+                                    HorizontalAlignment="Center"
+                                    FontSize="17">
+                                    获取摄像头信息中
+                                </Label>
+                            </StackPanel>
+                        </hc:ScrollViewer>
+                        <src:AMapControl
+                            x:Name="MainMap"
+                            Width="{Binding OverviewViewModel.mapWidth}"
+                            HorizontalAlignment="Right"
+                            PreviewMouseWheel="MainMap_PreviewMouseWheel" />
+                    </Grid>
+                </Border>
+                <Border Width="{Binding OverviewViewModel.ItemMaxWidth}" Style="{StaticResource ItemBorder}">
+                    <StackPanel>
+                        <TextBlock
+                            Margin="0,0,0,10"
+                            FontSize="26"
+                            FontWeight="Bold"
+                            Text="{Binding OverviewViewModel.UnReadEventCountInfo}" />
+                        <DataGrid
+                            x:Name="UnreadEventList"
+                            AutoGenerateColumns="False"
+                            IsReadOnly="True"
+                            PreviewMouseWheel="UnreadEventList_PreviewMouseWheel">
+                            <DataGrid.Columns>
+                                <DataGridTextColumn
+                                    Width="*"
+                                    Binding="{Binding eventID}"
+                                    FontSize="14"
+                                    Header="事件ID" />
+                                <DataGridTextColumn
+                                    Width="*"
+                                    Binding="{Binding type}"
+                                    FontSize="14"
+                                    Header="事件类型" />
+                                <DataGridTextColumn
+                                    Width="*"
+                                    Binding="{Binding cameraName}"
+                                    FontSize="14"
+                                    Header="捕获摄像头" />
+                                <DataGridTextColumn
+                                    Width="*"
+                                    Binding="{Binding time}"
+                                    FontSize="14"
+                                    Header="时间" />
+                            </DataGrid.Columns>
+                        </DataGrid>
+                    </StackPanel>
+                </Border>
+            </WrapPanel>
         </hc:ScrollViewer>
     </Grid>
 </UserControl>

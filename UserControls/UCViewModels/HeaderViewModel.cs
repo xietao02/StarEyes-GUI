@@ -4,7 +4,6 @@ using StarEyes_GUI.Common.Utils;
 
 namespace StarEyes_GUI.UserControls.UCViewModels {
     public class HeaderViewModel : NotificationObject {
-        private Thread _flickerNotification;
 
         #region 依赖属性
         private string _userToolTip;
@@ -34,15 +33,6 @@ namespace StarEyes_GUI.UserControls.UCViewModels {
             }
         }
 
-        private string _twinkling;
-        public string Twinkling {
-            get { return _twinkling; }
-            set {
-                _twinkling = value;
-                RaisePropertyChanged("Twinkling");
-            }
-        }
-
         #endregion
 
         #region 方法
@@ -50,33 +40,21 @@ namespace StarEyes_GUI.UserControls.UCViewModels {
         /// 构造函数
         /// </summary>
         public HeaderViewModel() {
-            CheckEventNum();
-            Twinkling = "Visible";
+            CheckEventNum(0);
             UserToolTip = "用户ID:" + StarEyesData.ID;
         }
 
         /// <summary>
         /// 检查未处理事件数量
         /// </summary>
-        public void CheckEventNum() {
-            if (StarEyesData.UnhandledEventNum == 0) {
+        public void CheckEventNum(int eventNum) {
+            if (eventNum == 0) {
                 NotifToolTip = "没有事件待处理";
                 BellSrc = "/Assets/icons/bell.png";
-                if (_flickerNotification != null) _flickerNotification.Abort();
             }
             else {
-                NotifToolTip = "有" + StarEyesData.UnhandledEventNum.ToString() + "件事件未处理！";
+                NotifToolTip = "有" + eventNum.ToString() + "件事件未处理！";
                 BellSrc = "/Assets/icons/bell-active.png";
-                _flickerNotification = new Thread(() => {
-                    while (StarEyesData.UnhandledEventNum != 0) {
-                        Thread.Sleep(500);
-                        Twinkling = "Hidden";
-                        Thread.Sleep(500);
-                        Twinkling = "Visible";
-                    }
-                });
-                _flickerNotification.IsBackground = true;
-                _flickerNotification.Start();
             }
         }
         #endregion

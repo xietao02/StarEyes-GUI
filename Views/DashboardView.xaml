@@ -6,9 +6,9 @@
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     Title="StarEyes - 控制面板"
     Width="1100"
-    Height="750"
+    Height="800"
     MinWidth="1100"
-    MinHeight="750"
+    MinHeight="800"
     Icon="/Assets/icons/logo32.png"
     WindowStartupLocation="CenterScreen"
     mc:Ignorable="d">

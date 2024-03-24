@@ -1,4 +1,5 @@
 ﻿using System;
+using System.IO;
 using System.Windows;
 using System.Windows.Controls;
 using StarEyes_GUI.ViewModels;
@@ -29,15 +30,26 @@ namespace StarEyes_GUI.Views {
             Grid.SetRow(DashboardViewModel.Sidebar, 1);
 
             // 初始化 _pages
-            theGrid.Children.Add(DashboardViewModel.PagesPresenter);
-            Grid.SetRow(DashboardViewModel.PagesPresenter, 1);
-            Grid.SetColumn(DashboardViewModel.PagesPresenter, 1);
+            theGrid.Children.Add(DashboardViewModel.PagePresenter);
+            Grid.SetRow(DashboardViewModel.PagePresenter, 1);
+            Grid.SetColumn(DashboardViewModel.PagePresenter, 1);
 
             Closed += DashboardView_Closed;
         }
 
         private void DashboardView_Closed(object sender, EventArgs e) {
-            Environment.Exit(0);
+            // 清空vstream缓存
+            if (Directory.Exists("./StayEyesCache/vstream")) {
+                string[] filePaths = Directory.GetFiles("./StayEyesCache/vstream/");
+                foreach (string filePath in filePaths) {
+                    try {
+                        File.Delete(filePath);
+                    }
+                    catch {
+                        //no action required
+                    }
+                }
+            }
         }
 
         #region 切换页面
@@ -55,17 +67,17 @@ namespace StarEyes_GUI.Views {
                 DashboardViewModel.DestructDashboardVM();
                 DashboardViewModel.LoginView = new();
                 DashboardViewModel.LoginView.Show();
-                this.Close();
+                Close();
             }
             else if(args.ItemIndex == -2) {
                 DashboardViewModel.Sidebar.SwitchItem(2);
-                DashboardViewModel.PagesPresenter.ToPage(2);
+                DashboardViewModel.PagePresenter.ToPage(2);
             }
             else if (args.ItemIndex == -4) {
                 DashboardViewModel.Sidebar.SwitchItem(4);
-                DashboardViewModel.PagesPresenter.ToPage(4);
+                DashboardViewModel.PagePresenter.ToPage(4);
             }
-            else DashboardViewModel.PagesPresenter.ToPage(args.ItemIndex);
+            else DashboardViewModel.PagePresenter.ToPage(args.ItemIndex);
             if (element == theGrid) {
                 args.Handled = true;
             } 

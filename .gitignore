@@ -26,11 +26,14 @@ bld/
 [Ll]ogs/
 
 .vs/
-SE.Properties.cs
 Properties/
 .editorconfig
 packages.config
 App.config
+app.manifest
+StarEyes_GUI_TemporaryKey.pfx
+MigrationBackup/
+
 
 
 # .NET Core

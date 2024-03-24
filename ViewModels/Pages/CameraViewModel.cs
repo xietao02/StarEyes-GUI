@@ -1,22 +1,22 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Windows;
-using System.Windows.Controls;
-using System.Windows.Data;
-using MySql.Data.MySqlClient;
+﻿using MySql.Data.MySqlClient;
 using StarEyes_GUI.Common.Data;
 using StarEyes_GUI.Common.Utils;
 using StarEyes_GUI.UserControls;
 using StarEyes_GUI.UserControls.UCViewModels;
 using StarEyes_GUI.Views.Pages.Dialogs;
+using System;
+using System.Collections.Generic;
+using System.Windows;
+using System.Windows.Controls;
+using System.Windows.Data;
 
 namespace StarEyes_GUI.ViewModels.Pages {
     public class CameraViewModel : PageViewModelBase{
         public WrapPanel Page;
-        public List<CameraItem> CameraList = new();
-        private List<CameraItem> _newCameraList = new();
         public Binding Binding;
         public bool IsAddViewShow = false;
+        public bool UpdateStatus = true;
+        private List<CameraItem> _newCameraList = new();
         private StarEyesServer _server = new();
         private AddCametaItemView _addCametaItemView;
 
@@ -47,9 +47,10 @@ namespace StarEyes_GUI.ViewModels.Pages {
             set {
                 _badConnCameraNum = value;
                 if (value == 0) {
-                    Info_AllCameraStatus = "所有摄像头连接正常";
                     Style_AllCameraStatus_FG = "White";
                     Style_AllCameraStatus_BG = "#29b94c";
+                    if (TotalCameraNum != 0) Info_AllCameraStatus = "所有摄像头连接正常";
+                    else Info_AllCameraStatus = "暂无摄像头";
                 }
                 else {
                     Info_AllCameraStatus = value + " 个摄像头连接异常";
@@ -71,7 +72,7 @@ namespace StarEyes_GUI.ViewModels.Pages {
                     Info_ComputerPosLat = "位置信息未知";
                 }
                 else {
-                    Info_ComputerPosLat = "默认使用当前位置经度：" + value;
+                    Info_ComputerPosLat = "默认使用当前位置纬度：" + value;
                 }
                 RaisePropertyChanged("Info_ComputerPosLat");
             }
@@ -87,7 +88,7 @@ namespace StarEyes_GUI.ViewModels.Pages {
                     Info_ComputerPosLon = "位置信息未知";
                 }
                 else {
-                    Info_ComputerPosLon = "默认使用当前位置纬度：" + value;
+                    Info_ComputerPosLon = "默认使用当前位置经度：" + value;
                 }
                 RaisePropertyChanged("Info_ComputerPosLon");
             }
@@ -97,17 +98,16 @@ namespace StarEyes_GUI.ViewModels.Pages {
         public CameraViewModel() {
             Binding = new Binding("ItemWidth") { Source = this };
         }
-        
+
         /// <summary>
         /// 同步服务器摄像头列表
         /// </summary>
-        public bool SycCameraView() {
-            bool Result = false;
-            Application.Current.Dispatcher.Invoke(new Action(() => {
-                BadConnCameraNum = 0;
-                string cmd = string.Format("SELECT * FROM cameras WHERE `organization`='{0}'", StarEyesData.Organization);
-                MySqlDataReader reader = _server.GetSQLReader(cmd);
-                if (reader != null) {
+        public void SycCameraView() {
+            //System.Diagnostics.Debug.WriteLine("开始更新摄像头列表");
+            string cmd = string.Format("SELECT * FROM cameras WHERE `organization`='{0}'", StarEyesData.Organization);
+            MySqlDataReader reader = _server.GetSQLReader(cmd);
+            if (reader != null) {
+                Application.Current.Dispatcher.Invoke(new Action(() => {
                     // 获取服务器摄像头列表
                     _newCameraList = new();
                     while (reader.Read()) {
@@ -117,20 +117,20 @@ namespace StarEyes_GUI.ViewModels.Pages {
                         _newCameraList.Add(cameraItem);
                     }
                     reader.Close();
-                    
+
                     // 比较服务器摄像头列表与本地摄像头列表
-                    if (CameraList.Count == 0) {
+                    if (StarEyesData.CameraList.Count == 0) {
                         // 本地摄像头列表为空，直接添加
-                        CameraList = _newCameraList;
-                        foreach (var cameraItem in CameraList) {
+                        StarEyesData.CameraList = _newCameraList;
+                        foreach (var cameraItem in StarEyesData.CameraList) {
                             Page.Children.Add(cameraItem);
                         }
                     }
                     else {
                         // 本地摄像头列表不为空，比较
-                        int indexOfCameraList = CameraList.Count;
+                        int indexOfCameraList = StarEyesData.CameraList.Count;
                         for (indexOfCameraList--; indexOfCameraList >= 0; indexOfCameraList--) {
-                            var cameraItem = CameraList[indexOfCameraList];
+                            var cameraItem = StarEyesData.CameraList[indexOfCameraList];
                             bool found = false;
                             int indexOfNewCameraList = _newCameraList.Count;
                             CameraItem newCameraItem = null;
@@ -147,15 +147,19 @@ namespace StarEyes_GUI.ViewModels.Pages {
                                 if (cameraItem.CameraItemViewModel.IsVLCOpen) {
                                     cameraItem.CameraItemViewModel.ExecuteSwitchVLC(null);
                                 }
-                                CameraList.Remove(cameraItem);
+                                StarEyesData.CameraList.Remove(cameraItem);
                                 Page.Children.RemoveAt(indexOfCameraList + 1);
                             }
                             else {
                                 // 更新摄像头其他信息
                                 cameraItem.CameraItemViewModel.CameraName = newCameraItem.CameraItemViewModel.CameraName;
                                 cameraItem.CameraItemViewModel.CameraStatus = newCameraItem.CameraItemViewModel.CameraStatus;
-                                cameraItem.CameraItemViewModel.CameraPosLon = newCameraItem.CameraItemViewModel.CameraPosLon;
-                                cameraItem.CameraItemViewModel.CameraPosLat = newCameraItem.CameraItemViewModel.CameraPosLat;
+                                if (cameraItem.CameraItemViewModel.CameraPosLon != newCameraItem.CameraItemViewModel.CameraPosLon) {
+                                    cameraItem.CameraItemViewModel.CameraPosLon = newCameraItem.CameraItemViewModel.CameraPosLon;
+                                }
+                                if (cameraItem.CameraItemViewModel.CameraPosLat != newCameraItem.CameraItemViewModel.CameraPosLat) {
+                                    cameraItem.CameraItemViewModel.CameraPosLat = newCameraItem.CameraItemViewModel.CameraPosLat;
+                                }
                                 cameraItem.CameraItemViewModel.CameraIP = newCameraItem.CameraItemViewModel.CameraIP;
                                 cameraItem.CameraItemViewModel.CameraPort = newCameraItem.CameraItemViewModel.CameraPort;
                                 cameraItem.CameraItemViewModel.RTSPAcount = newCameraItem.CameraItemViewModel.RTSPAcount;
@@ -165,32 +169,39 @@ namespace StarEyes_GUI.ViewModels.Pages {
                         }
                         foreach (var newCameraItem in _newCameraList) {
                             // 将服务器中新增的摄像头添加至本地
-                            CameraList.Add(newCameraItem);
+                            StarEyesData.CameraList.Add(newCameraItem);
                             Page.Children.Add(newCameraItem);
                         }
                     }
-
                     // 重新计算摄像头总数、连接异常摄像头数
-                    TotalCameraNum = CameraList.Count;
-                    CameraList.ForEach(theCameraItem => {
+                    TotalCameraNum = StarEyesData.CameraList.Count;
+                    int new_BadConnCameraNum = 0;
+                    StarEyesData.CameraList.ForEach(theCameraItem => {
                         if (!theCameraItem.CameraItemViewModel.CameraStatus) {
-                            BadConnCameraNum++;
+                            new_BadConnCameraNum++;
                         }
                     });
-                    Result = true;
-                }
-                else Result = false;
-            }));
-            return Result;
+                    BadConnCameraNum = new_BadConnCameraNum;
+                    UpdateStatus = true;
+                    //System.Diagnostics.Debug.WriteLine("摄像头数据更新完毕");
+                }));
+            }
+            else {
+                UpdateStatus = false;
+                //System.Diagnostics.Debug.WriteLine("访问摄像头数据库异常，更新中断");
+            }
         }
 
         /// <summary>
-        ///  关闭未关闭的摄像流
+        ///  停止摄像头item的活动
         /// </summary>
-        public void CloseVideoStream() {
-            CameraList.ForEach(theCameraItem => {
+        public void DisposeVideoItem() {
+            StarEyesData.CameraList.ForEach(theCameraItem => {
                 if (theCameraItem.CameraItemViewModel.IsVLCOpen) {
                     theCameraItem.CameraItemViewModel.ExecuteSwitchVLC(null);
+                }
+                if (theCameraItem.CameraItemViewModel.UploadVideoStreamThread != null) {
+                    theCameraItem.CameraItemViewModel.StopUploadtokenSource.Cancel();
                 }
             });
         }

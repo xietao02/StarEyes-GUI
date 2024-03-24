@@ -23,6 +23,26 @@ namespace StarEyes_GUI.ViewModels.Pages {
             }
         }
 
+        private static double _itemHalfWidth;
+        public double itemHalfWidth {
+            get { return _itemHalfWidth; }
+            set {
+                _itemHalfWidth = value;
+                RaisePropertyChanged("itemHalfWidth");
+            }
+        }
+
+
+        private static double _mapWidth;
+        public double mapWidth {
+            get { return _mapWidth; }
+            set {
+                _mapWidth = value;
+                RaisePropertyChanged("mapWidth");
+            }
+        }
+
+
         public void CalPageItemWidth(object sender, System.Windows.SizeChangedEventArgs args) {
             double pageWidth = args.NewSize.Width;
             if (pageWidth > 1230) {
@@ -32,6 +52,8 @@ namespace StarEyes_GUI.ViewModels.Pages {
                 ItemWidth = pageWidth - 20;
             }
             ItemMaxWidth = pageWidth - 20;
+            mapWidth = ItemMaxWidth - 205;
+            itemHalfWidth = ItemMaxWidth / 2 - 10;
         }
         #endregion
     }

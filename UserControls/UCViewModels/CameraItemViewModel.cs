@@ -1,4 +1,10 @@
-﻿using System;
+﻿using Emgu.CV;
+using Emgu.CV.CvEnum;
+using StarEyes_GUI.Common.Data;
+using StarEyes_GUI.Common.Utils;
+using StarEyes_GUI.ViewModels.Pages;
+using StarEyes_GUI.Views.Pages.Dialogs;
+using System;
 using System.IO;
 using System.Net;
 using System.Net.Sockets;
@@ -7,21 +13,19 @@ using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Windows;
-using OpenCvSharp;
-using StarEyes_GUI.Common.Utils;
-using StarEyes_GUI.ViewModels.Pages;
-using StarEyes_GUI.Views.Pages.Dialogs;
 using Vlc.DotNet.Wpf;
 
 namespace StarEyes_GUI.UserControls.UCViewModels {
     public class CameraItemViewModel : NotificationObject {
         public CameraViewModel CameraViewModel;
-        private Thread UploadVideoStreamThread;
+        public Task UploadVideoStreamThread = null;
 
         #region 摄像头属性
 
         public bool IsVLCOpen = false;
+        public bool IsLAN = false;
         public bool IsEditViewShow = false;
+        public CancellationTokenSource StopUploadtokenSource;
         private enum UploadStatusEnum {
             cannotUpload,
             notUpload,
@@ -82,10 +86,14 @@ namespace StarEyes_GUI.UserControls.UCViewModels {
                     }
                 }
                 else {
-                    if(UploadStatus != (int)UploadStatusEnum.cannotUpload) {
-                        UploadStatus = (int)UploadStatusEnum.notUpload;
+                    if(UploadStatus == (int)UploadStatusEnum.uploadBySelf) {
+                        Info_CameraStatus = "等待服务器接收视频流";
                     }
-                    Info_CameraStatus = "状态：异常";
+                    else if(UploadStatus == (int)UploadStatusEnum.uploadByOther || UploadStatus == (int)UploadStatusEnum.notUpload) {
+                        // 用于初始化时更新 UploadVideoButtonContent
+                        UploadStatus = (int)UploadStatusEnum.notUpload;
+                        Info_CameraStatus = "状态：异常";
+                    }
                     Status_Style = "#dc303e";
                 }
                 RaisePropertyChanged("Info_CameraStatus");
@@ -112,6 +120,7 @@ namespace StarEyes_GUI.UserControls.UCViewModels {
                 else if(value == (int)UploadStatusEnum.uploadBySelf) {
                     UploadVideoButtonEnable = "True";
                     UploadVideoButtonContent = "视频流上传中 | 停止";
+                    CameraStatus = false;
                 }
                 else{
                     UploadVideoButtonEnable = "False";
@@ -170,7 +179,7 @@ namespace StarEyes_GUI.UserControls.UCViewModels {
             get { return _cameraIP; }
             set {
                 _cameraIP = value;
-                if (CameraStatus) {
+                if (IsLAN) {
                     Info_CameraIP = "ip：" + value;
                 }
                 else {
@@ -225,13 +234,25 @@ namespace StarEyes_GUI.UserControls.UCViewModels {
         public string Info_CameraPos {
             get { return _info_CameraPos; }
             set {
-                string Lon, Lat;
-                if (CameraPosLon == "0") Lon = "未知";
-                else Lon = CameraPosLon;
-                if (CameraPosLat == "0") Lat = "未知";
-                else Lat = CameraPosLat;
-                _info_CameraPos = String.Format("经纬度：({0}, {1})", Lon, Lat);
-                RaisePropertyChanged("Info_CameraPos");
+                string lon, lat;
+                if (CameraPosLon == "0" || CameraPosLat == "0") {
+                    lon = "未知";
+                    lat = "未知";
+                    _info_CameraPos = "位置未知";
+                    RaisePropertyChanged("Info_CameraPos");
+                }
+                else {
+                    lon = CameraPosLon;
+                    lat = CameraPosLat;
+                    double d_lon, d_lat;
+                    new Task(() => {
+                        if (Double.TryParse(lon, out d_lon) && Double.TryParse(lat, out d_lat)) {
+                            _info_CameraPos = GeoCoord.GetAddressByLnLa(d_lon, d_lat);
+                        }
+                        else _info_CameraPos = "位置未知";
+                        RaisePropertyChanged("Info_CameraPos");
+                    }).Start();
+                }
             }
         }
 
@@ -296,43 +317,92 @@ namespace StarEyes_GUI.UserControls.UCViewModels {
         void ExecuteUploadVideoStream(object obj) {
             if (UploadStatus == (int)UploadStatusEnum.notUpload || UploadStatus == (int)UploadStatusEnum.cannotUpload) {
                 UploadVideoButtonContent = "尝试上传视频流中";
-                Console.WriteLine("尝试上传视频流中");
-                new Task(() => {
+                System.Diagnostics.Debug.WriteLine("尝试上传视频流中");
+                System.Diagnostics.Debug.WriteLine(_rtsp);
+                StopUploadtokenSource = new CancellationTokenSource();
+                // 创建cache文件夹
+                if (!Directory.Exists("./StayEyesCache")) {
+                    Directory.CreateDirectory("./StayEyesCache");
+                }
+                if (!Directory.Exists("./StayEyesCache/vstream")) {
+                    Directory.CreateDirectory("./StayEyesCache/vstream");
+                }
+                if (!Directory.Exists("./StayEyesCache/map")) {
+                    Directory.CreateDirectory("./StayEyesCache/map");
+                }
+                UploadVideoStreamThread = new Task(() => {
                     if (CheckVLCConnection()) {
                         UploadStatus = (int)UploadStatusEnum.uploadBySelf;
-                        UploadVideoStreamThread = new Thread(new ThreadStart(() => {
-                            //VideoCapture videoCapture = new VideoCapture(_rtsp, VideoCaptureAPIs.FFMPEG);
-                            VideoCapture videoCapture = new VideoCapture(0, VideoCaptureAPIs.ANY);
-                            Mat frame = new Mat();
-                            //if (videoCapture.Open("rtsp://admin:Aa123456@192.168.1.105:554/stream1")) Console.WriteLine("连接成功");
-                            //else Console.WriteLine("连接失败");
-                            Console.WriteLine(_rtsp);
-                            string outputDir = "D:\\StayEyesVideos\\";
-                            int index = 0;
-                            while (true) {
-                                index++;
-                                VideoWriter videoWriter = new VideoWriter();
-                                videoWriter.Open(outputDir + index.ToString() + ".mp4", VideoWriter.FourCC('M', 'P', '4', 'V'), 30.0, new OpenCvSharp.Size(frame.Width, frame.Height), true);
-                                for (int frames = 150; frames > 0; frames--) {
-                                    if (videoCapture.Read(frame)) Console.WriteLine("yes");
-                                    else Console.WriteLine("no");
-                                    videoWriter.Write(frame);
-                                    Cv2.ImShow("Live", frame);
-                                    Console.WriteLine("width: " + frame.Width + " height: " + frame.Height);
-                                    Cv2.WaitKey(33);
-                                }
-                                Console.WriteLine("视频流上传成功" + index);
+                        Backend[] backends = CvInvoke.WriterBackends;
+                        int backend_idx = 0; //any backend;
+                        foreach (Backend be in backends) {
+                            if (be.Name.Equals("MSMF")) {
+                                backend_idx = be.ID;
+                                break;
                             }
-                        }));
-                        UploadVideoStreamThread.Start();
+                        }
+                        while (!StopUploadtokenSource.Token.IsCancellationRequested) {
+                            VideoCapture capture = new VideoCapture(_rtsp);
+                            System.Drawing.Size size = new System.Drawing.Size(capture.Width, capture.Height);
+                            var now = DateTime.Now; // get current date and time
+                            string timestamp = now.ToString("_yyyyMMdd_HHmm"); // format as string
+                            string outputVideoName = CameraID + timestamp + ".mp4";
+                            string outputDirName = "./StayEyesCache/vstream/" + outputVideoName;
+                            while (File.Exists(outputDirName)) {
+                                System.Diagnostics.Debug.WriteLine("文件名重复！！！");
+                                Thread.Sleep(1000);
+                                timestamp = now.ToString("_yyyyMMdd_HHmm");
+                                outputVideoName = CameraID + timestamp + ".mp4";
+                                outputDirName = "./StayEyesCache/vstream/" + outputVideoName;
+                            }
+                            System.Diagnostics.Debug.WriteLine("开始生成 " + outputVideoName);
+                            VideoWriter writer = new VideoWriter(outputDirName, backend_idx, VideoWriter.Fourcc('H', '2', '6', '4'), 15, size, true);
+                            int totalFrames = 900;
+                            while (totalFrames-- >= 0) {
+                                Mat frame = capture.QueryFrame();
+                                if (frame == null) break;
+                                writer.Write(frame);
+                                frame.Dispose();
+                            }
+                            writer.Dispose();
+                            capture.Dispose();
+                            // 创建task进行上传
+                            new Task(() => {
+                                using (WebClient client = new WebClient()) {
+                                    try {
+                                        System.Diagnostics.Debug.WriteLine(outputVideoName + " 开始上传");
+                                        // 指定要上传的URL
+                                        string url = "http://star-eyes.cloud:9090/upload/?Content-Type=multipart/form-data";
+                                        // 调用UploadFile方法并获取响应字节数组
+                                        byte[] responseArray = client.UploadFile(url, outputDirName);
+                                        client.Dispose();
+                                        // 将响应字节数组转换为字符串并显示
+                                        string responseText = Encoding.ASCII.GetString(responseArray);
+                                        System.Diagnostics.Debug.WriteLine(responseText);
+                                    }
+                                    catch (Exception ex) {
+                                        System.Diagnostics.Debug.WriteLine("[上传视频流异常] " + ex.Message);
+                                    }
+                                    if (File.Exists(outputDirName)) {
+                                        try {
+                                            //File.Delete(outputDirName);
+                                        }
+                                        catch (Exception ex) {
+                                            System.Diagnostics.Debug.WriteLine("[尝试清空cache文件]" + ex.Message); //输出异常信息
+                                        }
+                                    }
+                                }
+                            }).Start();
+                        }
                     }
                     else {
                         UploadStatus = (int)UploadStatusEnum.cannotUpload;
                     }
-                }).Start();
+                }, StopUploadtokenSource.Token);
+                UploadVideoStreamThread.Start();
             }
             else if (UploadStatus == (int)UploadStatusEnum.uploadBySelf) {
-                UploadVideoStreamThread.Abort();
+                StopUploadtokenSource.Cancel();
                 UploadStatus = (int)UploadStatusEnum.notUpload;
             }
         }
@@ -485,16 +555,24 @@ namespace StarEyes_GUI.UserControls.UCViewModels {
                 tcpClient.GetStream().Write(buffer, 0, buffer.Length);
                 StreamReader streamReader = new(tcpClient.GetStream());
                 if (tcpClient.Connected) {
-                    string response = streamReader.ReadLine();
-                    if (response != null && response.Equals("RTSP/1.0 200 OK")) {
-                        tcpClient.Close();
-                        return true;
+                    try {
+                        string response = streamReader.ReadLine();
+                        if (response != null && response.Equals("RTSP/1.0 200 OK")) {
+                            tcpClient.Close();
+                            IsLAN = true;
+                            return true;
+                        }
+                    }
+                    catch {
+                        // no action required
                     }
                 }
                 tcpClient.Close();
+                IsLAN = false;
                 return false;
             }
             catch (SocketException) {
+                IsLAN = false;
                 return false;
             }
         }
@@ -509,10 +587,10 @@ namespace StarEyes_GUI.UserControls.UCViewModels {
                     CameraItem theCameraItem = CameraViewModel.Page.Children[indexOfPageChildren] as CameraItem;
                     if (theCameraItem.CameraItemViewModel.CameraID == id) {
                         CameraViewModel.Page.Children.Remove(theCameraItem);
-                        int indexOfCameraList = CameraViewModel.CameraList.Count;
+                        int indexOfCameraList = StarEyesData.CameraList.Count;
                         for (indexOfCameraList--; indexOfCameraList >= 0; indexOfCameraList--) {
-                            if (CameraViewModel.CameraList[indexOfCameraList].CameraItemViewModel.CameraID == id) {
-                                CameraViewModel.CameraList.RemoveAt(indexOfCameraList);
+                            if (StarEyesData.CameraList[indexOfCameraList].CameraItemViewModel.CameraID == id) {
+                                StarEyesData.CameraList.RemoveAt(indexOfCameraList);
                                 break;
                             }
                         }

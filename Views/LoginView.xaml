@@ -8,7 +8,7 @@
     Title="StarEyes - 登录"
     Width="750"
     Height="550"
-    Background="#FF131C2B"
+    Background="#070d1f"
     Icon="/Assets/icons/logo32.png"
     Loaded="Window_Loaded"
     ResizeMode="CanMinimize"

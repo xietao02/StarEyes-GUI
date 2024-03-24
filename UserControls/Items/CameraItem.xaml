@@ -9,7 +9,7 @@
     d:DesignHeight="450"
     d:DesignWidth="800"
     mc:Ignorable="d">
-    <Grid x:Name="testG">
+    <Grid>
         <Border
             Width="{Binding ItemWidth}"
             Margin="10"

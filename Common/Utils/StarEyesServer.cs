@@ -21,16 +21,25 @@ namespace StarEyes_GUI.Common.Utils {
         public MySqlConnection Connection {
             get {
                 if (_connection == null) {
-                    if (InitConnection()) {
+                    _connection = new(connectStr);
+                    try {
+                        _connection.Open();
                         return _connection;
                     }
-                    else return null;
+                    catch (MySqlException ex) {
+                        System.Diagnostics.Debug.WriteLine("[StarEyesServer] 数据库连接失败：[" + ex.Number + "]" + ex.Message);
+                        return null;
+                    }
                 }
                 else if (_connection.State == ConnectionState.Closed) {
-                    if (ReOpenConnection(3)) {
+                    try {
+                        _connection.Open();
                         return _connection;
                     }
-                    else return null;
+                    catch (MySqlException ex) {
+                        System.Diagnostics.Debug.WriteLine("[StarEyesServer] 数据库连接失败：[" + ex.Number + "]" + ex.Message);
+                        return null;
+                    }
                 }
                 else if (_connection.State == ConnectionState.Open) {
                     return _connection;
@@ -43,42 +52,7 @@ namespace StarEyes_GUI.Common.Utils {
             }
         }
 
-
         #region 数据库使用方法
-        /// <summary>
-        /// 初始化数据库连接
-        /// </summary>
-        /// <returns></returns>
-        private bool InitConnection() {
-            _connection = new(connectStr);
-            return ReOpenConnection(3);
-        }
-        
-        /// <summary>
-        /// 数据库连接重连方法
-        /// </summary>
-        /// <param name="times"></param>
-        /// <returns></returns>
-        private bool ReOpenConnection(int times = 1) {
-            if (times > 0) {
-                times--;
-                if (_connection != null) {
-                    try {
-                        _connection.Open();
-                        return true;
-                    }
-                    catch (MySqlException ex) {
-                        Console.WriteLine("数据库连接失败：[" + ex.Number + "]" + ex.Message + "剩余自动重连次数：" + times.ToString());
-                        Thread.Sleep(1000);
-                        return ReOpenConnection(times);
-                    }
-                }
-                else {
-                    return InitConnection();
-                }
-            }
-            else return false;
-        }
 
         /// <summary>
         /// 执行查询类的数据库操作
@@ -86,13 +60,14 @@ namespace StarEyes_GUI.Common.Utils {
         /// <param name="cmd"></param>
         /// <returns></returns>
         public MySqlDataReader GetSQLReader(string cmd) {
+            //System.Diagnostics.Debug.WriteLine("[StarEyesServer] 开始执行：" + cmd);
             if (Connection != null) {
                 MySqlCommand Cmd = new(cmd, Connection);
                 try {
                     return Cmd.ExecuteReader();
                 }
                 catch (MySqlException ex) {
-                    Console.WriteLine("数据库操作异常：[" + ex.Number + "]" + ex.Message);
+                    System.Diagnostics.Debug.WriteLine("[StarEyesServer] 数据库操作异常：[" + ex.Number + "]" + ex.Message);
                     return null;
                 }
             }
@@ -105,13 +80,14 @@ namespace StarEyes_GUI.Common.Utils {
         /// <param name="cmd"></param>
         /// <returns></returns>
         public int ExecuteNonQuerySQL(string cmd) {
+            //System.Diagnostics.Debug.WriteLine("[StarEyesServer] 开始执行：" + cmd);
             if (Connection != null) {
                 MySqlCommand Cmd = new(cmd, Connection);
                 try {
                     return Cmd.ExecuteNonQuery(); ;
                 }
                 catch (MySqlException ex) {
-                    Console.WriteLine("数据库操作异常：[" + ex.Number + "]" + ex.Message);
+                    System.Diagnostics.Debug.WriteLine("[StarEyesServer] 数据库操作异常：[" + ex.Number + "]" + ex.Message);
                     return -1;
                 }
             }
@@ -119,6 +95,9 @@ namespace StarEyes_GUI.Common.Utils {
         }
 
         public int ExecuteNonQuerySQL(string[] cmds) {
+            for (int i = 0; i < cmds.Length; i++) {
+                //System.Diagnostics.Debug.WriteLine("[StarEyesServer] 开始执行：" + cmds[i]);
+            }
             int rows = -1;
             if (Connection != null) {
                 for (int i = 0; i < cmds.Length; i++) {
@@ -128,7 +107,7 @@ namespace StarEyes_GUI.Common.Utils {
                             rows += Cmd.ExecuteNonQuery();
                         }
                         catch (MySqlException ex) {
-                            Console.WriteLine("数据库操作异常：[" + ex.Number + "]" + ex.Message);
+                            System.Diagnostics.Debug.WriteLine("[StarEyesServer] 数据库操作异常：[" + ex.Number + "]" + ex.Message);
                             return -1;
                         }
                     }
