@@ -49,7 +49,7 @@ namespace StarEyes_GUI.Common.Utils {
 
         
         public static string GetAddressJsonByLnLa(double lng, double lat, int timeout = 5000) {
-            const string key = "b45cb733044b39dfe55a3d1e4ea48424";
+            const string key = "Your AMap key here";
             string url = $"http://restapi.amap.com/v3/geocode/regeo?key={key}&location={lng}, {lat}";
             string json = "";
             try {

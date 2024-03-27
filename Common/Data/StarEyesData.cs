@@ -12,12 +12,12 @@ namespace StarEyes_GUI.Common.Data {
         /// <summary>
         /// 登录账号ID
         /// </summary>
-        public static string ID { get; set; } = "10001";    // For Debug 
+        public static string ID { get; set; } = "";
 
         /// <summary>
         /// 登录账号用户名
         /// </summary>
-        public static string UserName { get; set; } = "Developer";
+        public static string UserName { get; set; } = "";
 
         /// <summary>
         /// 登录账号微信号
@@ -27,7 +27,7 @@ namespace StarEyes_GUI.Common.Data {
         /// <summary>
         /// 登录账号邮箱
         /// </summary>
-        public static string Email { get; set; } = "txie20@lzu.edu.cn";
+        public static string Email { get; set; } = "";
 
         /// <summary>
         /// 登录账号电话号码
@@ -38,7 +38,7 @@ namespace StarEyes_GUI.Common.Data {
         /// <summary>
         /// 登录账号所属组织
         /// </summary>
-        public static string Organization { get; set; } = "507";    // For Debug 
+        public static string Organization { get; set; } = "";
 
 
         /// <summary>

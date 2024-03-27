@@ -32,7 +32,7 @@ namespace StarEyes_GUI.Common.Utils {
 
         public class AMapProvider : AMapProviderBase {
             public static readonly AMapProvider Instance;
-            readonly Guid id = new Guid("EF3DD303-3F74-4938-BF40-232D0595EE88");
+            readonly Guid id = new Guid("You GUID here");
             public override Guid Id {
                 get { return id; }
             }
